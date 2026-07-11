@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { MessagesModule } from './modules/messages/messages.module';
 import { DATABASE_ENTITIES } from './shared/infra/database/typeorm/entities';
 import { ConfigModule } from '@nestjs/config';
-import { UserModel } from './modules/users/infra/database/sqlite/model';
 
 @Module({
   imports: [
@@ -21,6 +22,8 @@ import { UserModel } from './modules/users/infra/database/sqlite/model';
       },
     ),
     UsersModule,
+    ChatModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [],
