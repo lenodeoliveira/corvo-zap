@@ -18,6 +18,7 @@ export interface MessageView {
   chatId: string;
   senderId: string;
   senderName: string;
+  canRead: boolean;
   departureAt: Date;
   originCityId: string;
   destinationCityId: string;
@@ -46,6 +47,7 @@ export class MessageViewService {
       chatId: message.getChatId(),
       senderId: message.getSenderId(),
       senderName,
+      canRead: tracking.status === DeliveryStatus.DELIVERED,
       departureAt: message.getDepartureAt(),
       originCityId: message.getOriginCityId(),
       destinationCityId: message.getDestinationCityId(),
