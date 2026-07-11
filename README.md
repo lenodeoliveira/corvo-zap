@@ -1,4 +1,8 @@
-# 🪶 Corvo-Zap
+<p align="center">
+  <img src="./frontend/assets/logo.png" width="150" alt="Corvo-Zap Logo"/>
+</p>
+
+# 🐦‍ Corvo-Zap
 
 <p align="center">
 
