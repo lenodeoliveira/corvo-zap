@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export interface UserEntityProps {
+  id?: string;
   name: string;
   email: string;
   passwordHash: string;
@@ -17,7 +18,7 @@ export class UserEntity {
   private passwordHash: string;
 
   private constructor(props: UserEntityProps) {
-    this.id = uuidv4();
+    this.id = props.id || uuidv4();
     this.name = props.name;
     this.email = props.email;
     this.passwordHash = props.passwordHash;

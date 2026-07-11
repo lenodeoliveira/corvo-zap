@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -15,7 +15,6 @@ import { USER_REPOSITORY } from '@/modules/users/infra/tokens/user.token.reposit
 
 interface CreateMessageProps {
   chatId: string;
-  senderId: string;
   content: string;
 }
 
@@ -32,7 +31,10 @@ export class CreateMessageService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(input: CreateMessageProps): Promise<Record<string, unknown>> {
+  async execute(
+    input: CreateMessageProps,
+    authenticatedUserId: string,
+  ): Promise<Record<string, unknown>> {
     const chat = await this.chatRepository.findById(input.chatId);
 
     if (!chat) {
@@ -40,28 +42,28 @@ export class CreateMessageService {
       throw new NotFoundException('Chat not found');
     }
 
-    const sender = await this.userRepository.findById(input.senderId);
+    const sender = await this.userRepository.findById(authenticatedUserId);
 
     if (!sender) {
-      this.logger.error('Sender not found', { senderId: input.senderId });
+      this.logger.error('Sender not found', { senderId: authenticatedUserId });
       throw new NotFoundException('Sender not found');
     }
 
     const isParticipant =
-      chat.getUserOneId() === input.senderId ||
-      chat.getUserTwoId() === input.senderId;
+      chat.getUserOneId() === authenticatedUserId ||
+      chat.getUserTwoId() === authenticatedUserId;
 
     if (!isParticipant) {
-      this.logger.error('Sender is not a participant of this chat', {
+      this.logger.error('Authenticated user is not a participant of this chat', {
         chatId: input.chatId,
-        senderId: input.senderId,
+        authenticatedUserId,
       });
-      throw new BadRequestException('Sender is not a participant of this chat');
+      throw new ForbiddenException('You can only send messages in chats you participate in');
     }
 
     const message = MessageEntity.create({
       chatId: input.chatId,
-      senderId: input.senderId,
+      senderId: authenticatedUserId,
       content: input.content,
     });
 

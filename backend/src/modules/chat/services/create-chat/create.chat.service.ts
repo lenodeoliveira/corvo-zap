@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -27,7 +28,25 @@ export class CreateChatService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(input: CreateChatProps): Promise<Record<string, unknown>> {
+  async execute(
+    input: CreateChatProps,
+    authenticatedUserId: string,
+  ): Promise<Record<string, unknown>> {
+    const isAuthenticatedUserParticipant =
+      input.userOneId === authenticatedUserId ||
+      input.userTwoId === authenticatedUserId;
+
+      console.log('isAuthenticatedUserParticipant', input.userOneId, input.userTwoId, authenticatedUserId);
+
+    if (!isAuthenticatedUserParticipant) {
+      this.logger.error('Authenticated user is not a participant of this chat', {
+        authenticatedUserId,
+        userOneId: input.userOneId,
+        userTwoId: input.userTwoId,
+      });
+      throw new ForbiddenException('You can only create chats that you participate in');
+    }
+
     if (input.userOneId === input.userTwoId) {
       this.logger.error('Users must be different');
       throw new BadRequestException('Users must be different');

@@ -10,6 +10,7 @@ import { CryptInfraService } from "./infra/services/crypt.infra.service";
 import { AuthLoginService } from "./services/auth-service/auth.login.service";
 import { AUTH_TOKEN_SERVICE } from "./infra/tokens/auth.token.service";
 import { AuthTokenService } from "./infra/services/auth.token.service";
+import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserModel])],
@@ -17,6 +18,7 @@ import { AuthTokenService } from "./infra/services/auth.token.service";
     providers: [ 
         AuthLoginService,
         CreateUserService,
+        JwtAuthGuard,
         {
             provide: USER_REPOSITORY,
             useClass: UsersRepository
@@ -30,7 +32,7 @@ import { AuthTokenService } from "./infra/services/auth.token.service";
             useClass: AuthTokenService
         }
     ],
-    exports: [USER_REPOSITORY]
+    exports: [USER_REPOSITORY, AUTH_TOKEN_SERVICE, JwtAuthGuard]
 })
 
 export class UsersModule { }

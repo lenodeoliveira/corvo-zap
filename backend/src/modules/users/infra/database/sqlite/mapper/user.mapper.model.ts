@@ -19,6 +19,7 @@ export class UserMapper {
         const users = models.map(model => {
             console.log('model', model.role, model.status)
             return UserEntity.create({
+                id: model.idUser,
                 name: model.name,
                 email: model.email,
                 passwordHash: model.password,

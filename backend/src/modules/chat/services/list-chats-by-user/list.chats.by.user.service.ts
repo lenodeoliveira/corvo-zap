@@ -20,15 +20,17 @@ export class ListChatsByUserService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string): Promise<Record<string, unknown>[]> {
-    const user = await this.userRepository.findById(userId);
+  async execute(authenticatedUserId: string): Promise<Record<string, unknown>[]> {
+    const user = await this.userRepository.findById(authenticatedUserId);
+
+    console.log('user', authenticatedUserId);
 
     if (!user) {
-      this.logger.error('User not found', { userId });
+      this.logger.error('User not found', { userId: authenticatedUserId });
       throw new NotFoundException('User not found');
     }
 
-    const chats = await this.chatRepository.findByUserId(userId);
+    const chats = await this.chatRepository.findByUserId(authenticatedUserId);
 
     return chats.map((chat) => chat.toJSON());
   }

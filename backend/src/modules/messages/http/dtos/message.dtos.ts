@@ -12,15 +12,6 @@ export class MessageDTO {
   chatId!: string;
 
   @IsNotEmpty()
-  @IsUUID()
-  @ApiProperty({
-    description: 'Sender user id',
-    type: String,
-    example: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-  })
-  senderId!: string;
-
-  @IsNotEmpty()
   @MinLength(1)
   @MaxLength(1000)
   @ApiProperty({

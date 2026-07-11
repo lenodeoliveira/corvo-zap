@@ -44,6 +44,8 @@ export class AuthLoginService {
       throw new ForbiddenException('User is not active');
     }
 
+    console.log('userFound', userFound[0]);
+
     const token = this.authTokenService.generateToken({ id: userFound[0].getId(), email: userFound[0].getEmail() });
 
     return {

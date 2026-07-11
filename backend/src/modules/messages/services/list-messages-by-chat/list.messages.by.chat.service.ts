@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -20,12 +21,27 @@ export class ListMessagesByChatService {
     private readonly chatRepository: IChatRepository,
   ) {}
 
-  async execute(chatId: string): Promise<Record<string, unknown>[]> {
+  async execute(
+    chatId: string,
+    authenticatedUserId: string,
+  ): Promise<Record<string, unknown>[]> {
     const chat = await this.chatRepository.findById(chatId);
 
     if (!chat) {
       this.logger.error('Chat not found', { chatId });
       throw new NotFoundException('Chat not found');
+    }
+
+    const isParticipant =
+      chat.getUserOneId() === authenticatedUserId ||
+      chat.getUserTwoId() === authenticatedUserId;
+
+    if (!isParticipant) {
+      this.logger.error('Authenticated user is not a participant of this chat', {
+        chatId,
+        authenticatedUserId,
+      });
+      throw new ForbiddenException('You can only list messages from chats you participate in');
     }
 
     const messages = await this.messageRepository.findByChatId(chatId);
