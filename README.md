@@ -26,6 +26,15 @@ O projeto foi criado como um laboratório para estudo de arquitetura de software
 
 ---
 
+<p align="center">
+
+![NestJS](https://img.shields.io/badge/NestJS-v11-E0234E?logo=nestjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+</p>
+
 # Tecnologias
 
 * NestJS
