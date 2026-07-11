@@ -1,0 +1,5 @@
+
+import { USER_MODEL } from "@/modules/users/infra/database/sqlite/model"
+import { CHAT_MODEL } from "@/modules/chat/infra/database/sqlite/model"
+
+export const DATABASE_ENTITIES = [...USER_MODEL, ...CHAT_MODEL]
