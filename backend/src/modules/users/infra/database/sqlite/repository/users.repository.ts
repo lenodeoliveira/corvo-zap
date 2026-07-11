@@ -22,7 +22,8 @@ export class UsersRepository implements IUserRepository {
             email: userModel.email,
             password: userModel.password,
             role: userModel.role,
-            status: userModel.status
+            status: userModel.status,
+            cityId: userModel.cityId,
         });
 
         return;
@@ -35,7 +36,7 @@ export class UsersRepository implements IUserRepository {
             },
         })
         if(!user) return null
-        console.log('user model found', user);
+
         const userEntity = UserMapper.toDomain([user])
 
         return userEntity

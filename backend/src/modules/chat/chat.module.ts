@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModel } from './infra/database/sqlite/model/chat.model';
 import { ChatControllers } from './http/controllers/chat.controllers';
@@ -7,9 +7,10 @@ import { ListChatsByUserService } from './services/list-chats-by-user/list.chats
 import { CHAT_REPOSITORY } from './infra/tokens/chat.token.repository';
 import { ChatsRepository } from './infra/database/sqlite/repository/chats.repository';
 import { UsersModule } from '../users/users.module';
+import { MessagesModule } from '../messages/messages.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatModel]), UsersModule],
+  imports: [TypeOrmModule.forFeature([ChatModel]), UsersModule, forwardRef(() => MessagesModule)],
   controllers: [ChatControllers],
   providers: [
     CreateChatService,

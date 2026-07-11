@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {IsNotEmpty, MaxLength, MinLength } from "class-validator"
+import {IsNotEmpty, IsUUID, MaxLength, MinLength } from "class-validator"
 
 export class UserDTO {
     @IsNotEmpty()
@@ -41,4 +41,13 @@ export class UserDTO {
         example: 'qwert56'
     })
     confirmPassword: string;
+
+    @IsNotEmpty()
+    @IsUUID()
+    @ApiProperty({
+        description: 'The city id of the user',
+        type: String,
+        example: '550e8400-e29b-41d4-a716-446655440000',
+    })
+    cityId!: string;
 }

@@ -11,6 +11,7 @@ interface UserProps {
     email: string;
     password: string;
     confirmPassword: string;
+    cityId: string;
 }
 
 @Injectable()
@@ -45,6 +46,9 @@ export class CreateUserService {
         name: input.name,
         email: input.email,
         passwordHash: passwordHash,
+        role: 'user',
+        status: 'active',
+        cityId: input.cityId,
       });
 
       await this.userRepository.create(user)

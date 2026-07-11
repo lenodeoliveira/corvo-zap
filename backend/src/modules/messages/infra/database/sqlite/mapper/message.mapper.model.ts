@@ -8,8 +8,14 @@ export class MessageMapper {
       id: entity.getId(),
       chatId: entity.getChatId(),
       senderId: entity.getSenderId(),
-      content: entity.getContent(),
+      encryptedContent: entity.getEncryptedContent(),
       status: entity.getStatus(),
+      arrivalAt: entity.getArrivalAt(),
+      distanceKm: entity.getDistanceKm(),
+      departureAt: entity.getDepartureAt(),
+      originCityId: entity.getOriginCityId(),
+      destinationCityId: entity.getDestinationCityId(),
+      travelTimeMinutes: entity.getTravelTimeMinutes(),
     };
   }
 
@@ -19,12 +25,18 @@ export class MessageMapper {
     }
 
     return models.map((model) =>
-      MessageEntity.create({
+      MessageEntity.send({
         id: model.id,
         chatId: model.chatId,
         senderId: model.senderId,
-        content: model.content,
+        encryptedContent: model.encryptedContent,
         status: model.status as MessageStatus,
+        arrivalAt: model.arrivalAt,
+        distanceKm: model.distanceKm,
+        departureAt: model.departureAt,
+        originCityId: model.originCityId,
+        destinationCityId: model.destinationCityId,
+        travelTimeMinutes: model.travelTimeMinutes,
       }),
     );
   }

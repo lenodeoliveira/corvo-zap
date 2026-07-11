@@ -4,8 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { CitiesModule } from './modules/cities/cities.module';
 import { DATABASE_ENTITIES } from './shared/infra/database/typeorm/entities';
 import { ConfigModule } from '@nestjs/config';
+import { DeliveryModule } from './modules/delivery/delivery.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     ChatModule,
     MessagesModule,
+    CitiesModule,
+    DeliveryModule,
   ],
   controllers: [AppController],
   providers: [],

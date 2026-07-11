@@ -7,6 +7,7 @@ export interface UserEntityProps {
   passwordHash: string;
   role: string;
   status: string;
+  cityId?: string;
 }
 
 export class UserEntity {
@@ -16,6 +17,7 @@ export class UserEntity {
   private role: string;
   private status: string;
   private passwordHash: string;
+  private cityId?: string;
 
   private constructor(props: UserEntityProps) {
     this.id = props.id || uuidv4();
@@ -24,6 +26,7 @@ export class UserEntity {
     this.passwordHash = props.passwordHash;
     this.role = props.role;
     this.status = props.status;
+    this.cityId = props.cityId;
   }
 
   public getId(): string {
@@ -60,6 +63,14 @@ export class UserEntity {
 
   public getStatus(): string {
     return this.status;
+  }
+
+  public getCityId(): string | undefined {
+    return this.cityId;
+  }
+
+  public changeCityId(cityId: string): void {
+    this.cityId = cityId;
   }
 
   public toJSON(): Record<string, unknown> {

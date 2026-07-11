@@ -33,8 +33,6 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload = this.authTokenService.verifyToken(token) as AuthUserPayload;
 
-      console.log('payload', payload);
-
       if (!payload?.id) {
         throw new UnauthorizedException('Invalid token payload');
       }

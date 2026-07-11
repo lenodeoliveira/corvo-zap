@@ -11,6 +11,7 @@ import { AuthLoginService } from "./services/auth-service/auth.login.service";
 import { AUTH_TOKEN_SERVICE } from "./infra/tokens/auth.token.service";
 import { AuthTokenService } from "./infra/services/auth.token.service";
 import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
+import { RolesGuard } from "./infra/guards/roles.guard";
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserModel])],
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
         AuthLoginService,
         CreateUserService,
         JwtAuthGuard,
+        RolesGuard,
         {
             provide: USER_REPOSITORY,
             useClass: UsersRepository
@@ -32,7 +34,7 @@ import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
             useClass: AuthTokenService
         }
     ],
-    exports: [USER_REPOSITORY, AUTH_TOKEN_SERVICE, JwtAuthGuard]
+    exports: [USER_REPOSITORY, AUTH_TOKEN_SERVICE, JwtAuthGuard, RolesGuard]
 })
 
 export class UsersModule { }

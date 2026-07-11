@@ -20,9 +20,27 @@ export class MessagesRepository implements IMessageRepository {
       id: messageModel.id,
       chatId: messageModel.chatId,
       senderId: messageModel.senderId,
-      content: messageModel.content,
+      encryptedContent: messageModel.encryptedContent,
       status: messageModel.status,
+      arrivalAt: messageModel.arrivalAt,
+      distanceKm: messageModel.distanceKm,
+      departureAt: messageModel.departureAt,
+      originCityId: messageModel.originCityId,
+      destinationCityId: messageModel.destinationCityId,
+      travelTimeMinutes: messageModel.travelTimeMinutes,
     });
+  }
+
+  async findById(id: string): Promise<MessageEntity | null> {
+    const message = await this.messagesRepository.findOne({
+      where: { id },
+    });
+
+    if (!message) {
+      return null;
+    }
+
+    return MessageMapper.toDomain([message])[0];
   }
 
   async findByChatId(chatId: string): Promise<MessageEntity[]> {

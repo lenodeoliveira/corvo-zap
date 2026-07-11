@@ -8,7 +8,8 @@ export class UserMapper {
             idUser: entity.getId(),
             name: entity.getName(),
             email: entity.getEmail(),
-            password: entity.getPassword()
+            password: entity.getPassword(),
+            cityId: entity.getCityId(),
         }
     } 
 
@@ -17,14 +18,14 @@ export class UserMapper {
 
 
         const users = models.map(model => {
-            console.log('model', model.role, model.status)
             return UserEntity.create({
                 id: model.idUser,
                 name: model.name,
                 email: model.email,
                 passwordHash: model.password,
                 role: model!.role!,
-                status: model!.status!
+                status: model!.status!,
+                cityId: model.cityId,
             })
         })
 

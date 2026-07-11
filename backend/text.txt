@@ -1,0 +1,22 @@
+
+
+node -e "
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('corvozap.sqlite');
+
+const userId = '26ae3a4c-5a1c-4977-8856-da4d003d7116';
+const cityId = '2ee706a1-b467-469a-9042-6f9b26fe337a';
+
+db.run(
+  'UPDATE tb_users SET city_id = ? WHERE idUser = ?',
+  [cityId, userId],
+  function (err) {
+    if (err) {
+      console.error('Erro:', err.message);
+      process.exit(1);
+    }
+    console.log('Linhas alteradas:', this.changes);
+    db.close();
+  }
+);
+"

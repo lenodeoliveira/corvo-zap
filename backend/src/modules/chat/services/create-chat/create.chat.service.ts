@@ -36,8 +36,6 @@ export class CreateChatService {
       input.userOneId === authenticatedUserId ||
       input.userTwoId === authenticatedUserId;
 
-      console.log('isAuthenticatedUserParticipant', input.userOneId, input.userTwoId, authenticatedUserId);
-
     if (!isAuthenticatedUserParticipant) {
       this.logger.error('Authenticated user is not a participant of this chat', {
         authenticatedUserId,

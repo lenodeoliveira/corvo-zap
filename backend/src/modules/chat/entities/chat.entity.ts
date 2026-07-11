@@ -25,6 +25,19 @@ export class ChatEntity {
     this.userTwoId = props.userTwoId;
   }
 
+  getRecipientId(senderId: string): string {
+    return this.userOneId === senderId
+      ? this.userTwoId
+      : this.userOneId;
+  }
+
+  hasParticipant(userId: string): boolean {
+    return (
+      this.userOneId === userId ||
+      this.userTwoId === userId
+    );
+  }
+
   public getId(): string {
     return this.id;
   }

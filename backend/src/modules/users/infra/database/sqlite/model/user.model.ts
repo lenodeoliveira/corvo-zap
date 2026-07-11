@@ -20,6 +20,9 @@ export class UserModel {
     @Column({ name: 'status', nullable: true, default: 'active' })
     status?: string;
 
+    @Column({ name: 'city_id', nullable: true })
+    cityId?: string;
+
     @Column({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
     createdAt!: Date;
 
