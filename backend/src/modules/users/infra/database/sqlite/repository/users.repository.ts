@@ -42,6 +42,12 @@ export class UsersRepository implements IUserRepository {
         return userEntity
     }
 
+    async findAll(): Promise<UserEntity[]> {
+        const users = await this.usersRepository.find();
+
+        return UserMapper.toDomain(users);
+    }
+
     async findById(id: string): Promise<UserEntity | null> {
         const user = await this.usersRepository.findOne({
             where: {

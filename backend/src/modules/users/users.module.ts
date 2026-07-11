@@ -8,6 +8,7 @@ import { UsersRepository } from "./infra/database/sqlite/repository/users.reposi
 import { CRYPT_SERVICE } from "./infra/tokens/crypt.token.service";
 import { CryptInfraService } from "./infra/services/crypt.infra.service";
 import { AuthLoginService } from "./services/auth-service/auth.login.service";
+import { ListUsersService } from "./services/list-users/list.users.service";
 import { AUTH_TOKEN_SERVICE } from "./infra/tokens/auth.token.service";
 import { AuthTokenService } from "./infra/services/auth.token.service";
 import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
@@ -19,6 +20,7 @@ import { RolesGuard } from "./infra/guards/roles.guard";
     providers: [ 
         AuthLoginService,
         CreateUserService,
+        ListUsersService,
         JwtAuthGuard,
         RolesGuard,
         {
