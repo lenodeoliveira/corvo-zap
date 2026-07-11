@@ -1,22 +1,24 @@
 # 🪶 Corvo-Zap
 
-> Cansado de mensagens instantâneas? Escreva sua mensagem e mande seu corvo.
+<p align="center">
 
-O **Corvo-Zap** é um aplicativo inspirado no envio de cartas por corvos. Diferente dos aplicativos tradicionais de mensagens, as mensagens **não são entregues instantaneamente**. O tempo de entrega depende da distância entre a cidade do remetente e a cidade do destinatário.
+**Porque algumas mensagens merecem fazer uma jornada.**
 
-Este projeto está sendo desenvolvido com foco em estudo de arquitetura de software, Domain-Driven Design (DDD), NestJS e boas práticas de desenvolvimento backend.
+Envie sua mensagem através de um corvo.
+
+As mensagens levam tempo para chegar ao destino, de acordo com a distância entre as cidades dos usuários.
+
+</p>
 
 ---
 
-# Objetivos
+## Sobre
 
-* Praticar arquitetura em camadas.
-* Aplicar princípios de orientação a objetos.
-* Trabalhar com casos de uso (Use Cases).
-* Implementar autenticação com JWT.
-* Criptografar mensagens.
-* Simular um sistema de entrega de mensagens baseado em distância.
-* Evoluir o projeto incrementalmente até uma aplicação completa.
+O **Corvo-Zap** é um aplicativo de mensagens inspirado nos mensageiros medievais.
+
+Diferente dos aplicativos tradicionais, uma mensagem não é entregue instantaneamente. Quando uma carta é enviada, um corvo inicia sua viagem entre duas cidades. Durante esse período, o remetente pode acompanhar a entrega, enquanto o destinatário precisa aguardar a chegada do corvo para ler o conteúdo.
+
+O projeto foi criado como um laboratório para estudo de arquitetura de software, Domain-Driven Design (DDD), NestJS e boas práticas de engenharia de software.
 
 ---
 
@@ -26,197 +28,195 @@ Este projeto está sendo desenvolvido com foco em estudo de arquitetura de softw
 * TypeScript
 * TypeORM
 * SQLite
-* JWT
+* JWT Authentication
 * bcrypt
-* Crypto (Node.js)
+* Node Crypto (AES)
 * Swagger
-
----
-
-# Conceito
-
-Cada usuário pertence a uma cidade.
-
-Quando uma mensagem é enviada:
-
-1. O sistema identifica a cidade do remetente.
-2. Identifica a cidade do destinatário.
-3. Calcula a distância entre elas.
-4. Calcula o tempo de viagem do corvo.
-5. Agenda a entrega.
-6. Criptografa o conteúdo.
-7. Salva a mensagem.
-
-Enquanto o corvo está viajando:
-
-* o remetente pode visualizar a mensagem;
-* o destinatário acompanha apenas o progresso da entrega.
-
-Após a chegada:
-
-* a mensagem é descriptografada e fica disponível ao destinatário.
 
 ---
 
 # Arquitetura
 
-```text
-Users
+```
+src
 │
-├── Authentication
-│
-├── Chats
-│
-├── Messages
-│
-├── Cities
-│
-├── Distance
-│
-├── Delivery
-│
-├── Tracking
-│
-└── Crypto
+├── auth
+├── users
+├── cities
+├── chats
+├── messages
+├── crypto
+├── distance
+├── delivery
+└── tracking
 ```
 
-Cada módulo possui uma responsabilidade bem definida.
+Cada módulo possui uma única responsabilidade, seguindo princípios de Clean Architecture e SOLID.
 
 ---
 
-# Funcionalidades implementadas
+# Como funciona
 
-## Usuários
+```mermaid
+flowchart TD
 
-* Cadastro de usuários
-* Senhas protegidas com bcrypt
-* Associação do usuário a uma cidade
+A[Usuário escreve uma mensagem]
 
-## Autenticação
+A --> B[Busca remetente]
 
-* Login
-* JWT
-* Rotas protegidas
+B --> C[Busca destinatário]
 
-## Cidades
+C --> D[Obtém cidades]
 
-* Listagem de cidades
-* Cadastro de cidades (somente administrador)
+D --> E[DistanceService]
 
-## Chats
+E --> F[DeliveryService]
 
-* Criação de chats
-* Listagem dos chats do usuário
+F --> G[CryptoService]
 
-## Mensagens
+G --> H[Salva Message]
 
-* Envio de mensagens
-* Conteúdo criptografado
-* Associação a um chat
-
-## Distância
-
-* Cálculo da distância entre cidades
-* Cálculo do tempo de viagem
-
-## Entrega
-
-* Definição da data de partida
-* Definição da data prevista de chegada
-
-## Rastreamento
-
-Cada mensagem possui informações de entrega:
-
-* status
-* progresso
-* distância
-* tempo restante
-* previsão de chegada
-
----
-
-# Fluxo de envio
-
-```text
-Usuário
-
-↓
-
-Seleciona um chat
-
-↓
-
-Escreve a mensagem
-
-↓
-
-DistanceService
-
-↓
-
-DeliveryService
-
-↓
-
-CryptoService
-
-↓
-
-MessageRepository
-
-↓
-
-SQLite
+H --> I[Corvo inicia viagem]
 ```
 
 ---
 
 # Fluxo de leitura
 
-```text
-Usuário solicita a mensagem
+```mermaid
+flowchart TD
 
-↓
+A[Usuário abre mensagem]
 
-TrackingService
+A --> B[TrackingService]
 
-↓
+B --> C{É o remetente?}
 
-É o remetente?
+C -->|Sim| D[Descriptografa]
 
-├── Sim → descriptografa
-│
-└── Não
-     │
-     ├── Entrega concluída?
-     │      │
-     │      ├── Sim → descriptografa
-     │      │
-     │      └── Não → retorna apenas o rastreamento
+C -->|Não| E{Entrega concluída?}
+
+E -->|Não| F[Retorna rastreamento]
+
+E -->|Sim| D
+
+D --> G[Exibe conteúdo]
 ```
 
 ---
 
-# Exemplo de resposta
+# Funcionalidades
+
+## Usuários
+
+* Cadastro
+* Login
+* JWT
+* Associação com cidade
+
+---
+
+## Chats
+
+* Criar chat
+* Listar chats do usuário
+
+---
+
+## Mensagens
+
+* Enviar mensagens
+* Conteúdo criptografado
+* Rastreamento em tempo real
+
+---
+
+## Cidades
+
+* Listagem
+* Cadastro (Admin)
+
+---
+
+## Distância
+
+Calcula automaticamente:
+
+* distância
+* tempo de viagem
+
+---
+
+## Entrega
+
+Calcula automaticamente:
+
+* partida
+* chegada
+* status
+
+---
+
+## Rastreamento
+
+Cada mensagem possui informações sobre sua viagem.
+
+Exemplo:
 
 ```json
 {
-  "id": "31072f2c-3462-4e69-9192-c3ec370719cd",
-  "chatId": "8da4d98c-3680-4f87-91b7-a0fa00e23a4c",
-  "senderId": "26ae3a4c-5a1c-4977-8856-da4d003d7116",
-  "departureAt": "2026-07-11T03:19:19.205Z",
-  "originCityId": "2ee706a1-b467-469a-9042-6f9b26fe337a",
-  "destinationCityId": "b47efff6-96ca-4faf-81e8-3d4de3be9e3d",
+  "status": "TRAVELING",
+  "progress": 67,
+  "distanceKm": 1484,
+  "remainingMinutes": 367,
+  "arrivalAt": "2026-07-12T15:27:02Z"
+}
+```
+
+---
+
+# Estrutura do domínio
+
+```mermaid
+classDiagram
+
+User "1" --> "1" City
+
+User "1" --> "*" Chat
+
+Chat "1" --> "*" Message
+
+Message --> Delivery
+
+Delivery --> Tracking
+```
+
+---
+
+# Exemplo de retorno
+
+```json
+{
+  "id": "...",
+  "chatId": "...",
+  "senderId": "...",
+
+  "departureAt": "...",
+
+  "originCityId": "...",
+  "destinationCityId": "...",
+
   "travelTimeMinutes": 1113,
+
   "tracking": {
     "status": "DELIVERED",
     "progress": 100,
     "distanceKm": 1484,
-    "arrivalAt": "2026-07-11T21:52:19.205Z",
     "remainingMinutes": 0,
-    "deliveredAt": "2026-07-11T21:52:19.205Z"
+    "arrivalAt": "...",
+    "deliveredAt": "..."
   },
+
   "content": "Tudo certo e com você?"
 }
 ```
@@ -227,42 +227,87 @@ TrackingService
 
 ## Backend
 
-* [x] Cadastro de usuários
-* [x] Login com JWT
-* [x] Cadastro de cidades
-* [x] Chats
-* [x] Mensagens
-* [x] Criptografia
-* [x] Cálculo de distância
-* [x] Agendamento de entrega
-* [x] Rastreamento da mensagem
-* [ ] Testes automatizados
-* [ ] Notificações
+* ✅ Cadastro de usuários
+* ✅ Login JWT
+* ✅ Cadastro de cidades
+* ✅ Chats
+* ✅ Mensagens
+* ✅ Criptografia
+* ✅ Cálculo de distância
+* ✅ Agendamento da entrega
+* ✅ Rastreamento da viagem
 
-## Mobile
+### Próximos passos
 
-* [ ] React Native
-* [ ] Login
-* [ ] Lista de chats
-* [ ] Tela de conversa
-* [ ] Rastreamento do corvo
-* [ ] Mapa medieval
-* [ ] Notificações Push
-
-## Futuro
-
-* [ ] Diferentes tipos de corvos
-* [ ] Clima afetando a viagem
-* [ ] Rotas entre cidades
-* [ ] Sistema de amizades
-* [ ] Grupos
-* [ ] Skins para corvos
-* [ ] Conquistas
-* [ ] Histórico de viagens
-* [ ] Deploy na AWS
+* ⬜ Testes unitários
+* ⬜ Testes E2E
+* ⬜ Docker
+* ⬜ Refresh Token
+* ⬜ Rate Limiting
+* ⬜ Cache
 
 ---
 
-# Objetivo do projeto
+## Mobile
 
-O Corvo-Zap não pretende ser apenas um aplicativo de mensagens, mas um projeto de estudo para explorar arquitetura de software, modelagem de domínio e boas práticas de desenvolvimento, utilizando um domínio diferente dos exemplos tradicionais de CRUD.
+* ⬜ React Native
+* ⬜ Login
+* ⬜ Lista de chats
+* ⬜ Tela de conversa
+* ⬜ Rastreamento do corvo
+* ⬜ Push Notifications
+
+---
+
+## Gameplay
+
+* ⬜ Mapa medieval
+* ⬜ Corvos personalizados
+* ⬜ Corvos lendários
+* ⬜ Sistema de amizades
+* ⬜ Grupos
+* ⬜ Rotas entre cidades
+* ⬜ Clima afetando a viagem
+* ⬜ Conquistas
+
+---
+
+# Exemplo de arquitetura
+
+```mermaid
+flowchart LR
+
+Controller --> UseCase
+
+UseCase --> Repository
+
+UseCase --> DistanceService
+
+UseCase --> DeliveryService
+
+UseCase --> TrackingService
+
+UseCase --> CryptoService
+
+Repository --> SQLite
+```
+
+---
+
+# Objetivo
+
+Este projeto tem como principal objetivo estudar:
+
+* Arquitetura em Camadas
+* Clean Architecture
+* DDD
+* SOLID
+* NestJS
+* TypeORM
+* Autenticação JWT
+* Criptografia
+* Testes automatizados
+* React Native
+* AWS
+
+utilizando um domínio divertido e diferente dos tradicionais sistemas CRUD.
