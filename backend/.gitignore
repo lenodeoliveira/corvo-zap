@@ -5,7 +5,11 @@
 
 # database
 /data
-/corvo-zap.db
+/corvozap.sqlite
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
 
 # Logs
 logs
