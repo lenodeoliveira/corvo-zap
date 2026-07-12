@@ -1,5 +1,5 @@
-import { Module } from "@nestjs/common";
-import { CryptoMessageService } from "./crypto.message.service";
+import { Module } from '@nestjs/common';
+import { CryptoMessageService } from './domain/service/crypto.message.service';
 
 @Module({
   imports: [],

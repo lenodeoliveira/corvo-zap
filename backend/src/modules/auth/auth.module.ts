@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-import { AuthControllers } from './http/controllers/auth.controllers';
-import { AuthLoginService } from './services/auth-login/auth.login.service';
-import { JwtAuthGuard } from './infra/guards/jwt-auth.guard';
-import { RolesGuard } from './infra/guards/roles.guard';
-import { AUTH_TOKEN_SERVICE } from './infra/tokens/auth.token.service';
-import { AuthTokenService } from './infra/services/auth.token.service';
+import { AuthControllers } from './interfaces/http/controllers/auth.controllers';
+import { AuthLoginService } from './application/usecases/auth-login/auth.login.service';
+import { JwtAuthGuard } from './shared/infra/http/guards/jwt-auth.guard';
+import { RolesGuard } from './shared/infra/http/guards/roles.guard';
+import { AUTH_TOKEN_SERVICE } from './infra/gateway/auth.token';
+import { AuthTokenService } from './infra/gateway/auth.token.service';
 import { UsersModule } from '../users/users.module';
 import { PasswordModule } from '../password/password.module';
 

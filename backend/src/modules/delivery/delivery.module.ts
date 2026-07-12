@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
-import { DeliveryService } from "./services/delivery.service";
-import { TrackingService } from "./services/tracking.service";
-import { DistanceService } from "./services/distance.service";
+import { Module } from '@nestjs/common';
+import { DeliveryService } from './application/usecases/delivery.service';
+import { TrackingService } from './application/usecases/tracking.service';
+import { DistanceService } from './application/usecases/distance.service';
 
 @Module({
   providers: [DeliveryService, TrackingService, DistanceService],
   exports: [DeliveryService, TrackingService, DistanceService],
 })
-export class DeliveryModule {}  
+export class DeliveryModule {}

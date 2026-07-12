@@ -1,4 +1,4 @@
-import { UserEntity } from "src/modules/users/entities/user.entity";
+import { UserEntity } from "src/modules/users/domain/entities/user.entity";
 
 describe('UserEntity', () => {
   it('should be defined', () => {
