@@ -1,6 +1,7 @@
 
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ListUsersQueryDto } from './dtos/list-users-query.dto';
 import { UserDTO } from './dtos/users.dtos';
 import { JwtAuthGuard } from '@/modules/auth/shared/infra/http/guards/jwt-auth.guard';
 import { SWAGGER_JWT_AUTH } from '@/docs/swagger';
@@ -26,9 +27,10 @@ export class UsersControllers {
   @ApiUnauthorizedResponse({ description: 'Token ausente, inválido ou expirado' })
   @ApiOperation({
     summary: 'Listar usuários',
-    description: 'Retorna todos os usuários cadastrados. Requer autenticação.',
+    description:
+      'Retorna usuários paginados. Aceita busca parcial por nome ou e-mail via query param `search`. Requer autenticação.',
   })
-  async listUsers() {
-    return await this.listUsersService.execute();
+  async listUsers(@Query() query: ListUsersQueryDto) {
+    return await this.listUsersService.execute(query);
   }
 }

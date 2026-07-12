@@ -46,9 +46,14 @@ export class ListChatsByUserService {
           chat.getUserOneId(),
           chat.getUserTwoId(),
         ]);
+        const otherParticipantId =
+          chat.getUserOneId() === authenticatedUserId
+            ? chat.getUserTwoId()
+            : chat.getUserOneId();
 
         return {
           ...chat.toJSON(),
+          otherParticipantName: senderNames[otherParticipantId] ?? '',
           messages: messages.map((message) =>
             this.messageViewService.toView(
               message,

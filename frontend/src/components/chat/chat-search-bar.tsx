@@ -6,14 +6,19 @@ import { theme } from '@/theme';
 type ChatSearchBarProps = {
   value: string;
   onChangeText: (value: string) => void;
+  placeholder?: string;
 };
 
-export function ChatSearchBar({ value, onChangeText }: ChatSearchBarProps) {
+export function ChatSearchBar({
+  value,
+  onChangeText,
+  placeholder = 'Buscar',
+}: ChatSearchBarProps) {
   return (
     <View style={styles.container}>
       <Feather name="search" size={18} color={theme.colors.text.disabled} />
       <TextInput
-        placeholder="Buscar"
+        placeholder={placeholder}
         placeholderTextColor={theme.colors.text.disabled}
         selectionColor={theme.colors.primary}
         style={styles.input}

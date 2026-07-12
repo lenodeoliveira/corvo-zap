@@ -1,10 +1,12 @@
 import { UserEntity } from "../../entities/user.entity";
-import { UserModel } from "../../../infra/database/typeorm/models/user.model";
+import { UserSearchParams } from "./user-search.params";
 
 interface IUserRepository {
   findByEmail(email: string): Promise<UserEntity[] | null>;
   findById(id: string): Promise<UserEntity | null>;
-  findAll(): Promise<UserEntity[]>;
+  searchPaginated(
+    params: UserSearchParams,
+  ): Promise<{ users: UserEntity[]; total: number }>;
   create(user: UserEntity): Promise<void>;
 }
 

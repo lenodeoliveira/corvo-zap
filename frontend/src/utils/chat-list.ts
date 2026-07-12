@@ -9,12 +9,24 @@ export function getParticipantName(
   currentUserId: string,
   fallback = 'Contato',
 ): string {
+  if (chat.otherParticipantName?.trim()) {
+    return chat.otherParticipantName;
+  }
+
   const otherParticipantId = getOtherParticipantId(chat, currentUserId);
   const messageFromParticipant = chat.messages?.find(
     (message) => message.senderId === otherParticipantId,
   );
 
-  return messageFromParticipant?.senderName ?? fallback;
+  if (messageFromParticipant?.senderName) {
+    return messageFromParticipant.senderName;
+  }
+
+  const messageFromOther = chat.messages?.find(
+    (message) => message.senderId !== currentUserId,
+  );
+
+  return messageFromOther?.senderName ?? fallback;
 }
 
 export function getLastMessage(chat: Chat): Message | undefined {

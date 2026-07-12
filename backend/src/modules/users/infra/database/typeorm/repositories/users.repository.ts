@@ -1,4 +1,5 @@
 import type IUserRepository from "src/modules/users/domain/repositories/interface-users/user.repository.interface";
+import { UserSearchParams } from "src/modules/users/domain/repositories/interface-users/user-search.params";
 import { Repository } from "typeorm";
 import { UserModel } from "@/modules/users/infra/database/typeorm/models/user.model";
 import { Injectable } from "@nestjs/common";
@@ -42,10 +43,31 @@ export class UsersRepository implements IUserRepository {
         return userEntity
     }
 
-    async findAll(): Promise<UserEntity[]> {
-        const users = await this.usersRepository.find();
+    async searchPaginated(
+        params: UserSearchParams,
+    ): Promise<{ users: UserEntity[]; total: number }> {
+        const { search, page, limit } = params;
+        const queryBuilder = this.usersRepository.createQueryBuilder('user');
 
-        return UserMapper.toDomain(users);
+        if (search?.trim()) {
+            const term = `%${search.trim().toLowerCase()}%`;
+            queryBuilder.where(
+                'LOWER(user.name) LIKE :term OR LOWER(user.email) LIKE :term',
+                { term },
+            );
+        }
+
+        queryBuilder
+            .orderBy('user.name', 'ASC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+        const [users, total] = await queryBuilder.getManyAndCount();
+
+        return {
+            users: UserMapper.toDomain(users),
+            total,
+        };
     }
 
     async findById(id: string): Promise<UserEntity | null> {

@@ -5,6 +5,16 @@ export type User = {
   cityId?: string;
 };
 
+export type PaginatedResponse<T> = {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
 export type AuthResponse = {
   user: User;
   token: string;
@@ -52,6 +62,7 @@ export type Chat = {
   id: string;
   userOneId: string;
   userTwoId: string;
+  otherParticipantName?: string;
   messages?: Message[];
 };
 
