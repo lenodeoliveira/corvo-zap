@@ -3,6 +3,10 @@
 /node_modules
 /build
 
+# database
+/data
+/corvo-zap.db
+
 # Logs
 logs
 *.log
