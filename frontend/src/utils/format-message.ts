@@ -1,4 +1,5 @@
 import type { MessageTracking } from '@/types/api';
+import type { LiveTracking } from '@/utils/message-tracking';
 
 export function formatMessageTime(date: string): string {
   return new Date(date).toLocaleTimeString('pt-BR', {
@@ -38,7 +39,9 @@ export function formatRemainingTime(minutes: number): string {
   return `${remainingMinutes}min`;
 }
 
-export function getDistanceProgress(tracking: MessageTracking): {
+export function getDistanceProgress(
+  tracking: Pick<MessageTracking, 'progress' | 'distanceKm'> | LiveTracking,
+): {
   traveledKm: number;
   totalKm: number;
 } {

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatComposer } from '@/components/chat/chat-composer';
 import { ChatDetailHeader } from '@/components/chat/chat-detail-header';
 import { ChatMessageItem } from '@/components/chat/chat-message-item';
+import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
 import { useTheme } from '@/hooks/use-theme';
 import { chatsService } from '@/services/chats.service';
 import { messagesService } from '@/services/messages.service';
@@ -24,6 +25,7 @@ import { useAuthStore } from '@/store/auth-store';
 import { theme } from '@/theme';
 import type { Message } from '@/types/api';
 import { getParticipantName } from '@/utils/chat-list';
+import { getMessagesRefetchInterval } from '@/utils/message-tracking';
 
 function sortMessagesChronologically(messages: Message[]): Message[] {
   return [...messages].sort(
@@ -53,7 +55,18 @@ export default function ChatScreen() {
     queryKey: ['messages', id],
     queryFn: () => messagesService.listByChat(id),
     enabled: Boolean(id),
-    refetchInterval: 30_000,
+    refetchInterval: (query) => getMessagesRefetchInterval(query.state.data),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+  });
+
+  const handleMessageDelivered = useCallback(() => {
+    void refetch();
+    void queryClient.invalidateQueries({ queryKey: ['chats'] });
+  }, [queryClient, refetch]);
+
+  useRefetchOnAppFocus(() => {
+    void refetch();
   });
 
   const sendMutation = useMutation({
@@ -123,7 +136,11 @@ export default function ChatScreen() {
               <Text style={styles.emptyText}>Nenhuma mensagem neste chat.</Text>
             }
             renderItem={({ item }) => (
-              <ChatMessageItem currentUserId={currentUserId} message={item} />
+              <ChatMessageItem
+                currentUserId={currentUserId}
+                message={item}
+                onMessageDelivered={handleMessageDelivered}
+              />
             )}
           />
         )}

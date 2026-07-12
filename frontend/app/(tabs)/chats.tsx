@@ -17,12 +17,14 @@ import { ChatSearchBar } from '@/components/chat/chat-search-bar';
 import { ChatsHeader } from '@/components/chat/chats-header';
 import { UserListItem } from '@/components/chat/user-list-item';
 import { useTheme } from '@/hooks/use-theme';
+import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
 import { chatsService } from '@/services/chats.service';
 import { usersService } from '@/services/users.service';
 import { useAuthStore } from '@/store/auth-store';
 import { theme } from '@/theme';
 import type { Chat, User } from '@/types/api';
 import { filterChats } from '@/utils/chat-list';
+import { getChatsRefetchInterval } from '@/utils/message-tracking';
 import { getOrCreateChat } from '@/utils/open-chat';
 import { getUsersWithoutChat } from '@/utils/user-search';
 
@@ -59,6 +61,13 @@ export default function ChatsScreen() {
   const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['chats'],
     queryFn: () => chatsService.listMine(),
+    refetchInterval: (query) => getChatsRefetchInterval(query.state.data),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+  });
+
+  useRefetchOnAppFocus(() => {
+    void refetch();
   });
 
   const {

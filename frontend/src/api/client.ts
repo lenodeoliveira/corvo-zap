@@ -1,3 +1,5 @@
+import { router } from 'expo-router';
+
 import { useAuthStore } from '@/store/auth-store';
 import { env } from '@/utils/env';
 
@@ -38,6 +40,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     headers: requestHeaders,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+
+  if (response.status === 401 && auth) {
+    useAuthStore.getState().clearSession();
+    router.replace('/(auth)/login');
+    throw new ApiError('Sessão expirada. Faça login novamente.', response.status);
+  }
 
   if (!response.ok) {
     const message = await response.text();

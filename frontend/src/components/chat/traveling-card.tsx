@@ -2,20 +2,21 @@ import Feather from '@expo/vector-icons/Feather';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '@/theme';
-import type { MessageTracking } from '@/types/api';
 import {
   formatArrivalLabel,
   formatRemainingTime,
   getDistanceProgress,
 } from '@/utils/format-message';
+import type { LiveTracking } from '@/utils/message-tracking';
 
 type TravelingCardProps = {
-  tracking: MessageTracking;
   departureAt: string;
+  arrivalAt: string;
+  liveTracking: LiveTracking;
 };
 
-export function TravelingCard({ tracking, departureAt }: TravelingCardProps) {
-  const { traveledKm, totalKm } = getDistanceProgress(tracking);
+export function TravelingCard({ departureAt, arrivalAt, liveTracking }: TravelingCardProps) {
+  const { traveledKm, totalKm } = getDistanceProgress(liveTracking);
 
   return (
     <View style={styles.wrapper}>
@@ -38,9 +39,9 @@ export function TravelingCard({ tracking, departureAt }: TravelingCardProps) {
 
         <View style={styles.progressHeader}>
           <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${tracking.progress}%` }]} />
+            <View style={[styles.progressFill, { width: `${liveTracking.progress}%` }]} />
           </View>
-          <Text style={styles.progressValue}>{tracking.progress}%</Text>
+          <Text style={styles.progressValue}>{liveTracking.progress}%</Text>
         </View>
 
         <View style={styles.statsRow}>
@@ -53,7 +54,9 @@ export function TravelingCard({ tracking, departureAt }: TravelingCardProps) {
 
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Tempo restante</Text>
-            <Text style={styles.statValue}>{formatRemainingTime(tracking.remainingMinutes)}</Text>
+            <Text style={styles.statValue}>
+              {formatRemainingTime(liveTracking.remainingMinutes)}
+            </Text>
           </View>
         </View>
 
@@ -65,7 +68,7 @@ export function TravelingCard({ tracking, departureAt }: TravelingCardProps) {
 
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Chegada prevista</Text>
-            <Text style={styles.statValue}>{formatArrivalLabel(tracking.arrivalAt)}</Text>
+            <Text style={styles.statValue}>{formatArrivalLabel(arrivalAt)}</Text>
           </View>
         </View>
       </View>

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { AppProviders } from '@/components/providers/app-providers';
+import { useAuthStore } from '@/store/auth-store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -11,7 +12,12 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    void useAuthStore
+      .getState()
+      .hydrate()
+      .finally(() => {
+        SplashScreen.hideAsync();
+      });
   }, []);
 
   return (
