@@ -1,24 +1,22 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import type IMessageRepository from '../../../domain/repositories/interface-messages/message.repository.interface';
-import type IChatRepository from '@/modules/chat/domain/repositories/interface-chat/chat.repository.interface';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type ICityRepository from '@/modules/cities/domain/repositories/interface-cities/city.repository.interface';
 import { MessageEntity } from '../../../domain/entities/message.entity';
 import { MESSAGE_REPOSITORY } from '../../../infra/database/typeorm/tokens/message.token.repository';
-import { CHAT_REPOSITORY } from '@/modules/chat/infra/database/typeorm/tokens/chat.token.repository';
 import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
 import { CITY_REPOSITORY } from '@/modules/cities/infra/database/typeorm/tokens/city.token.repository';
 import { DeliveryService } from '@/modules/delivery/application/usecases/delivery.service';
 import { DistanceService } from '@/modules/delivery/application/usecases/distance.service';
 import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';
 import { MessageViewService, type MessageView } from '../message-view/message.view.service';
+import { ChatParticipantService } from '@/modules/chat/application/services/chat-participant.service';
 
 interface CreateMessageProps {
   chatId: string;
@@ -32,8 +30,7 @@ export class CreateMessageService {
   constructor(
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: IMessageRepository,
-    @Inject(CHAT_REPOSITORY)
-    private readonly chatRepository: IChatRepository,
+    private readonly chatParticipantService: ChatParticipantService,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
     @Inject(CITY_REPOSITORY)
@@ -48,30 +45,20 @@ export class CreateMessageService {
     input: CreateMessageProps,
     authenticatedUserId: string,
   ): Promise<MessageView> {
-    const chat = await this.chatRepository.findById(input.chatId);
-
-    if (!chat) {
-      this.logger.error('Chat not found', { chatId: input.chatId });
-      throw new NotFoundException('Chat not found');
-    }
+    const chat = await this.chatParticipantService.requireById(
+      input.chatId,
+      authenticatedUserId,
+      {
+        forbiddenMessage:
+          'You can only send messages in chats you participate in',
+      },
+    );
 
     const sender = await this.userRepository.findById(authenticatedUserId);
 
     if (!sender) {
       this.logger.error('Sender not found', { senderId: authenticatedUserId });
       throw new NotFoundException('Sender not found');
-    }
-
-    const isParticipant =
-      chat.getUserOneId() === authenticatedUserId ||
-      chat.getUserTwoId() === authenticatedUserId;
-
-    if (!isParticipant) {
-      this.logger.error('Authenticated user is not a participant of this chat', {
-        chatId: input.chatId,
-        authenticatedUserId,
-      });
-      throw new ForbiddenException('You can only send messages in chats you participate in');
     }
 
     const recipientId = chat.getRecipientId(authenticatedUserId);
