@@ -8,10 +8,11 @@ import {
 import { CreateCityService } from '../../services/create-city/create.city.service';
 import { ListCitiesService } from '../../services/list-cities/list.cities.service';
 import { UpdateCityService } from '../../services/update-city/update.city.service';
+import { GetCityService } from '../../services/get-city/get.city.service';
 import { CreateCityDTO, UpdateCityDTO } from '../dtos/city.dtos';
-import { JwtAuthGuard } from '@/modules/users/infra/guards/jwt-auth.guard';
-import { RolesGuard } from '@/modules/users/infra/guards/roles.guard';
-import { Roles } from '@/modules/users/infra/decorators/roles.decorator';
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt-auth.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { SWAGGER_JWT_AUTH } from '@/docs/swagger';
 
 @ApiTags('cities')
@@ -25,11 +26,17 @@ export class CityControllers {
     private readonly createCityService: CreateCityService,
     private readonly listCitiesService: ListCitiesService,
     private readonly updateCityService: UpdateCityService,
+    private readonly getCityService: GetCityService,
   ) {}
 
   @Get('')
   async listCities() {
     return await this.listCitiesService.execute();
+  }
+
+  @Get(':id')
+  async getCity(@Param('id') id: string) {
+    return await this.getCityService.execute(id);
   }
 
   @Post('')

@@ -14,6 +14,11 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter())
 
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // Enable automatic transformation

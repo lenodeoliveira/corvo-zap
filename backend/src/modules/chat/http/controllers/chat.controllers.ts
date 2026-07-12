@@ -3,9 +3,9 @@ import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger
 import { CreateChatService } from '../../services/create-chat/create.chat.service';
 import { ListChatsByUserService } from '../../services/list-chats-by-user/list.chats.by.user.service';
 import { ChatDTO } from '../dtos/chat.dtos';
-import { JwtAuthGuard } from '@/modules/users/infra/guards/jwt-auth.guard';
-import { CurrentUser } from '@/modules/users/infra/decorators/current-user.decorator';
-import type { AuthUserPayload } from '@/modules/users/interfaces/auth-user.interface';
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt-auth.guard';
+import { CurrentUser } from '@/modules/auth/infra/decorators/current-user.decorator';
+import type { AuthUserPayload } from '@/modules/auth/interfaces/auth-user.interface';
 import { SWAGGER_JWT_AUTH } from '@/docs/swagger';
 
 @ApiTags('chats')

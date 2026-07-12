@@ -78,6 +78,7 @@ export class UserEntity {
       id: this.id,
       name: this.name,
       email: this.email,
+      cityId: this.cityId,
     };
   }
 

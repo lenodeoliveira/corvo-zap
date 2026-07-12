@@ -1,9 +1,9 @@
 import { BadRequestException, Inject, Injectable, Logger } from "@nestjs/common";
 import type IUserRepository from "../../interfaces/user.repository.interface";
 import { UserEntity } from "../../entities/user.entity";
-import type IEncryption from "../../interfaces/cript.interface";
+import type IEncryption from "@/modules/password/interfaces/crypt.interface";
 import { USER_REPOSITORY } from "../../infra/tokens/user.token.repository";
-import { CRYPT_SERVICE } from "../../infra/tokens/crypt.token.service";
+import { CRYPT_SERVICE } from "@/modules/password/infra/tokens/crypt.token.service";
 
 
 interface UserProps {

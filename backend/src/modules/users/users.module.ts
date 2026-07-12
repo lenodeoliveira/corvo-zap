@@ -1,42 +1,24 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserModel } from "./infra/database/sqlite/model/user.model";
-import { UsersControllers } from "./http/controllers/user.controllers";
-import { CreateUserService } from "./services/create-user/create.user.service";
-import { USER_REPOSITORY } from "./infra/tokens/user.token.repository";
-import { UsersRepository } from "./infra/database/sqlite/repository/users.repository";
-import { CRYPT_SERVICE } from "./infra/tokens/crypt.token.service";
-import { CryptInfraService } from "./infra/services/crypt.infra.service";
-import { AuthLoginService } from "./services/auth-service/auth.login.service";
-import { ListUsersService } from "./services/list-users/list.users.service";
-import { AUTH_TOKEN_SERVICE } from "./infra/tokens/auth.token.service";
-import { AuthTokenService } from "./infra/services/auth.token.service";
-import { JwtAuthGuard } from "./infra/guards/jwt-auth.guard";
-import { RolesGuard } from "./infra/guards/roles.guard";
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModel } from './infra/database/sqlite/model/user.model';
+import { UsersControllers } from './http/controllers/user.controllers';
+import { CreateUserService } from './services/create-user/create.user.service';
+import { USER_REPOSITORY } from './infra/tokens/user.token.repository';
+import { UsersRepository } from './infra/database/sqlite/repository/users.repository';
+import { ListUsersService } from './services/list-users/list.users.service';
+import { PasswordModule } from '../password/password.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserModel])],
-    controllers: [UsersControllers],
-    providers: [ 
-        AuthLoginService,
-        CreateUserService,
-        ListUsersService,
-        JwtAuthGuard,
-        RolesGuard,
-        {
-            provide: USER_REPOSITORY,
-            useClass: UsersRepository
-        },
-        {
-            provide: CRYPT_SERVICE,
-            useClass: CryptInfraService
-        },
-        {
-            provide: AUTH_TOKEN_SERVICE,
-            useClass: AuthTokenService
-        }
-    ],
-    exports: [USER_REPOSITORY, AUTH_TOKEN_SERVICE, JwtAuthGuard, RolesGuard]
+  imports: [TypeOrmModule.forFeature([UserModel]), PasswordModule],
+  controllers: [UsersControllers],
+  providers: [
+    CreateUserService,
+    ListUsersService,
+    {
+      provide: USER_REPOSITORY,
+      useClass: UsersRepository,
+    },
+  ],
+  exports: [USER_REPOSITORY],
 })
-
-export class UsersModule { }
+export class UsersModule {}

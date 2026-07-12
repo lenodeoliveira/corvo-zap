@@ -16,7 +16,7 @@ export const enableSwagger = (
             type: 'http',
             scheme: 'bearer',
             bearerFormat: 'JWT',
-            description: 'Token JWT obtido em POST /users/login. Exemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            description: 'Token JWT obtido em POST /auth/login. Exemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
         },
         SWAGGER_JWT_AUTH,
     )
