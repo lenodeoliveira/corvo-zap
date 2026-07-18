@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +11,8 @@ import {
   StyleSheet,
   Text,
   View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -43,6 +45,8 @@ export default function ChatScreen() {
   const currentUserId = useAuthStore((state) => state.user?.id ?? '');
   const realtimeConnected = useRealtimeStore((state) => state.connected);
   const [draft, setDraft] = useState('');
+  const listRef = useRef<FlatList<Message>>(null);
+  const shouldStickToBottomRef = useRef(true);
 
   useJoinChat(id);
 
@@ -103,6 +107,58 @@ export default function ChatScreen() {
   }, [chats, currentUserId, data, id]);
 
   const messages = useMemo(() => sortMessagesChronologically(data ?? []), [data]);
+  const lastMessage = messages.at(-1);
+
+  const scrollToBottom = useCallback((animated = true) => {
+    if (messages.length === 0) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToEnd({ animated });
+    });
+  }, [messages.length]);
+
+  useEffect(() => {
+    if (isLoading || messages.length === 0) {
+      return;
+    }
+
+    shouldStickToBottomRef.current = true;
+    scrollToBottom(false);
+  }, [id, isLoading, scrollToBottom]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      return;
+    }
+
+    shouldStickToBottomRef.current = true;
+    scrollToBottom(true);
+  }, [
+    lastMessage?.id,
+    lastMessage?.tracking.deliveredAt,
+    lastMessage?.tracking.readAt,
+    lastMessage?.tracking.status,
+    messages.length,
+    scrollToBottom,
+  ]);
+
+  const handleListScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const distanceFromBottom =
+      contentSize.height - layoutMeasurement.height - contentOffset.y;
+
+    shouldStickToBottomRef.current = distanceFromBottom < 96;
+  }, []);
+
+  const handleContentSizeChange = useCallback(() => {
+    if (!shouldStickToBottomRef.current) {
+      return;
+    }
+
+    scrollToBottom(false);
+  }, [scrollToBottom]);
 
   function handleSend() {
     const content = draft.trim();
@@ -136,6 +192,7 @@ export default function ChatScreen() {
           </View>
         ) : (
           <FlatList
+            ref={listRef}
             contentContainerStyle={[
               styles.list,
               messages.length === 0 && styles.listEmpty,
@@ -143,6 +200,9 @@ export default function ChatScreen() {
             data={messages}
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
+            onContentSizeChange={handleContentSizeChange}
+            onScroll={handleListScroll}
+            scrollEventThrottle={16}
             ListEmptyComponent={
               <Text style={styles.emptyText}>Nenhuma mensagem neste chat.</Text>
             }
