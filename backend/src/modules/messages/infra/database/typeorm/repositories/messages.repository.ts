@@ -1,5 +1,5 @@
 import type IMessageRepository from '@/modules/messages/domain/repositories/interface-messages/message.repository.interface';
-import { MessageEntity } from '@/modules/messages/domain/entities/message.entity';
+import { MessageEntity, MessageStatus } from '@/modules/messages/domain/entities/message.entity';
 import { MessageModel } from '@/modules/messages/infra/database/typeorm/models/message.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,6 +28,30 @@ export class MessagesRepository implements IMessageRepository {
       originCityId: messageModel.originCityId,
       destinationCityId: messageModel.destinationCityId,
       travelTimeMinutes: messageModel.travelTimeMinutes,
+      deliveredAt: messageModel.deliveredAt,
+      readAt: messageModel.readAt,
+    });
+  }
+
+  async update(message: MessageEntity): Promise<void> {
+    message.validate();
+    const messageModel = MessageMapper.toModel(message);
+
+    await this.messagesRepository.save({
+      id: messageModel.id,
+      chatId: messageModel.chatId,
+      senderId: messageModel.senderId,
+      encryptedContent: messageModel.encryptedContent,
+      status: messageModel.status,
+      arrivalAt: messageModel.arrivalAt,
+      distanceKm: messageModel.distanceKm,
+      departureAt: messageModel.departureAt,
+      originCityId: messageModel.originCityId,
+      destinationCityId: messageModel.destinationCityId,
+      travelTimeMinutes: messageModel.travelTimeMinutes,
+      deliveredAt: messageModel.deliveredAt,
+      readAt: messageModel.readAt,
+      updatedAt: new Date(),
     });
   }
 
@@ -53,10 +77,10 @@ export class MessagesRepository implements IMessageRepository {
   }
 
   async findPendingDelivery(): Promise<MessageEntity[]> {
-    const messages = await this.messagesRepository
-      .createQueryBuilder('message')
-      .where('message.arrivalAt > :now', { now: new Date() })
-      .getMany();
+    const messages = await this.messagesRepository.find({
+      where: { status: MessageStatus.TRAVELING },
+      order: { arrivalAt: 'ASC' },
+    });
 
     return MessageMapper.toDomain(messages);
   }

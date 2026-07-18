@@ -33,7 +33,7 @@ export type RegisterPayload = {
   cityId: string;
 };
 
-export type TrackingStatus = 'TRAVELING' | 'DELIVERED';
+export type TrackingStatus = 'TRAVELING' | 'DELIVERED' | 'READ';
 
 export type MessageTracking = {
   status: TrackingStatus;
@@ -41,7 +41,8 @@ export type MessageTracking = {
   distanceKm: number;
   remainingMinutes: number;
   arrivalAt: string;
-  deliveredAt?: string;
+  deliveredAt?: string | null;
+  readAt?: string | null;
 };
 
 export type Message = {

@@ -4,6 +4,8 @@ import { MessageModel } from './infra/database/typeorm/models/message.model';
 import { MessageControllers } from './interfaces/http/controllers/message.controllers';
 import { CreateMessageService } from './application/usecases/create-message/create.message.service';
 import { MessageViewService } from './application/usecases/message-view/message.view.service';
+import { MarkMessageAsDeliveredService } from './application/usecases/mark-message-as-delivered/mark.message.as.delivered.service';
+import { MarkMessageAsReadService } from './application/usecases/mark-message-as-read/mark.message.as.read.service';
 import { MESSAGE_REPOSITORY } from './domain/tokens/message.repository.token';
 import { MessagesRepository } from './infra/database/typeorm/repositories/messages.repository';
 import { ChatModule } from '../chat/chat.module';
@@ -25,11 +27,18 @@ import { CitiesModule } from '../cities/cities.module';
   providers: [
     CreateMessageService,
     MessageViewService,
+    MarkMessageAsDeliveredService,
+    MarkMessageAsReadService,
     {
       provide: MESSAGE_REPOSITORY,
       useClass: MessagesRepository,
     },
   ],
-  exports: [MESSAGE_REPOSITORY, MessageViewService],
+  exports: [
+    MESSAGE_REPOSITORY,
+    MessageViewService,
+    MarkMessageAsDeliveredService,
+    MarkMessageAsReadService,
+  ],
 })
 export class MessagesModule {}

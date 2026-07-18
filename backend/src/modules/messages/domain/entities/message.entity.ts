@@ -18,6 +18,8 @@ export interface MessageEntityProps {
   originCityId: string;
   destinationCityId: string;
   travelTimeMinutes: number;
+  deliveredAt?: Date | null;
+  readAt?: Date | null;
 }
 
 export class MessageEntity {
@@ -32,6 +34,8 @@ export class MessageEntity {
   private originCityId: string;
   private destinationCityId: string;
   private travelTimeMinutes: number;
+  private deliveredAt: Date | null;
+  private readAt: Date | null;
 
   private constructor(props: MessageEntityProps) {
     if (!props.chatId) {
@@ -81,6 +85,8 @@ export class MessageEntity {
     this.originCityId = props.originCityId;
     this.destinationCityId = props.destinationCityId;
     this.travelTimeMinutes = props.travelTimeMinutes;
+    this.deliveredAt = props.deliveredAt ?? null;
+    this.readAt = props.readAt ?? null;
   }
 
   public getId(): string {
@@ -127,6 +133,40 @@ export class MessageEntity {
     return this.travelTimeMinutes;
   }
 
+  public getDeliveredAt(): Date | null {
+    return this.deliveredAt;
+  }
+
+  public getReadAt(): Date | null {
+    return this.readAt;
+  }
+
+  public markAsDelivered(): void {
+    if (this.status !== MessageStatus.TRAVELING) {
+      return;
+    }
+
+    this.status = MessageStatus.DELIVERED;
+    this.deliveredAt = new Date();
+  }
+
+  public markAsRead(readerId: string): void {
+    if (readerId === this.senderId) {
+      return;
+    }
+
+    if (this.status === MessageStatus.TRAVELING) {
+      throw new Error('Message has not been delivered yet');
+    }
+
+    if (this.status === MessageStatus.READ) {
+      return;
+    }
+
+    this.status = MessageStatus.READ;
+    this.readAt = new Date();
+  }
+
   public toJSON(): Record<string, unknown> {
     return {
       id: this.id,
@@ -140,6 +180,8 @@ export class MessageEntity {
       originCityId: this.originCityId,
       destinationCityId: this.destinationCityId,
       travelTimeMinutes: this.travelTimeMinutes,
+      deliveredAt: this.deliveredAt,
+      readAt: this.readAt,
     };
   }
 

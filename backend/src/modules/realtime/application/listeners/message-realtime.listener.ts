@@ -4,6 +4,7 @@ import {
   DOMAIN_EVENTS,
   MessageCreatedEvent,
   MessageDeliveredEvent,
+  MessageReadEvent,
 } from '@/modules/events';
 import { MessageRealtimeService } from '../services/message-realtime.service';
 
@@ -35,6 +36,18 @@ export class MessageRealtimeListener {
       await this.messageRealtimeService.notifyMessageDelivered(event.messageId);
     } catch (error) {
       this.logger.error('Failed to notify message delivery', {
+        messageId: event.messageId,
+        error: error instanceof Error ? error.message : 'unknown',
+      });
+    }
+  }
+
+  @OnEvent(DOMAIN_EVENTS.MESSAGE_READ)
+  async handleMessageRead(event: MessageReadEvent): Promise<void> {
+    try {
+      await this.messageRealtimeService.notifyMessageRead(event.messageId);
+    } catch (error) {
+      this.logger.error('Failed to notify message read', {
         messageId: event.messageId,
         error: error instanceof Error ? error.message : 'unknown',
       });

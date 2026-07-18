@@ -8,9 +8,18 @@ type MessageBubbleProps = {
   isOwn: boolean;
   time: string;
   isDelivered: boolean;
+  isRead: boolean;
 };
 
-export function MessageBubble({ content, isOwn, time, isDelivered }: MessageBubbleProps) {
+export function MessageBubble({
+  content,
+  isOwn,
+  time,
+  isDelivered,
+  isRead,
+}: MessageBubbleProps) {
+  const receiptColor = isRead ? theme.colors.primary : theme.colors.black;
+
   return (
     <View style={[styles.row, isOwn ? styles.rowOwn : styles.rowOther]}>
       <View style={[styles.bubble, isOwn ? styles.bubbleOwn : styles.bubbleOther]}>
@@ -20,12 +29,12 @@ export function MessageBubble({ content, isOwn, time, isDelivered }: MessageBubb
           <Text style={styles.time}>{time}</Text>
           {isOwn ? (
             <View style={styles.readReceipt}>
-              <Feather name="check" size={12} color={theme.colors.black} />
+              <Feather name="check" size={12} color={receiptColor} />
               {isDelivered ? (
                 <Feather
                   name="check"
                   size={12}
-                  color={theme.colors.black}
+                  color={receiptColor}
                   style={styles.secondCheck}
                 />
               ) : null}

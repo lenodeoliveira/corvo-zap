@@ -1,6 +1,8 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
 
 import { useLiveTracking } from '@/hooks/use-live-tracking';
+import { realtimeService } from '@/services/realtime.service';
 import { theme } from '@/theme';
 import type { Message } from '@/types/api';
 import { formatMessageTime } from '@/utils/format-message';
@@ -20,7 +22,10 @@ export function ChatMessageItem({
   onMessageDelivered,
 }: ChatMessageItemProps) {
   const isOwn = message.senderId === currentUserId;
-  const isServerDelivered = message.tracking.status === 'DELIVERED';
+  const isServerRead = message.tracking.status === 'READ';
+  const isServerDelivered =
+    message.tracking.status === 'DELIVERED' || isServerRead;
+  const hasMarkedReadRef = useRef(false);
 
   const liveTracking = useLiveTracking({
     departureAt: message.departureAt,
@@ -33,6 +38,24 @@ export function ChatMessageItem({
         },
   });
 
+  useEffect(() => {
+    if (
+      isOwn ||
+      message.tracking.status !== 'DELIVERED' ||
+      hasMarkedReadRef.current
+    ) {
+      return;
+    }
+
+    hasMarkedReadRef.current = true;
+
+    void realtimeService.markMessageRead(message.id).then((response) => {
+      if (!response?.ok) {
+        hasMarkedReadRef.current = false;
+      }
+    });
+  }, [isOwn, message.id, message.tracking.status]);
+
   const isAwaitingContent = !isOwn && liveTracking.status === 'DELIVERED' && !isServerDelivered;
   const showIncomingTravelingCard = !isOwn && liveTracking.status === 'TRAVELING';
   const showBubble = isOwn || isServerDelivered;
@@ -44,6 +67,7 @@ export function ChatMessageItem({
           content={message.content ?? ''}
           isOwn={isOwn}
           isDelivered={isServerDelivered}
+          isRead={isServerRead}
           time={formatMessageTime(message.departureAt)}
         />
       ) : null}

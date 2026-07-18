@@ -1,9 +1,19 @@
 import { io, type Socket } from 'socket.io-client';
 
-import { REALTIME_EVENTS, type RealtimeEventPayload } from '@/realtime/realtime.events';
+import {
+  REALTIME_CLIENT_EVENTS,
+  REALTIME_EVENTS,
+  type RealtimeEventPayload,
+} from '@/realtime/realtime.events';
 import { env } from '@/utils/env';
+import type { Message } from '@/types/api';
 
 type MessageEventHandler = (payload: RealtimeEventPayload) => void;
+
+type MarkMessageReadResponse = {
+  ok: true;
+  message: Message;
+};
 
 let socket: Socket | null = null;
 
@@ -37,7 +47,24 @@ export const realtimeService = {
   },
 
   joinChat(chatId: string): void {
-    socket?.emit('joinChat', { chatId });
+    socket?.emit(REALTIME_CLIENT_EVENTS.JOIN_CHAT, { chatId });
+  },
+
+  markMessageRead(messageId: string): Promise<MarkMessageReadResponse | undefined> {
+    return new Promise((resolve) => {
+      if (!socket?.connected) {
+        resolve(undefined);
+        return;
+      }
+
+      socket.emit(
+        REALTIME_CLIENT_EVENTS.MARK_MESSAGE_READ,
+        { messageId },
+        (response: MarkMessageReadResponse | undefined) => {
+          resolve(response);
+        },
+      );
+    });
   },
 
   onMessageCreated(handler: MessageEventHandler): void {
@@ -54,6 +81,14 @@ export const realtimeService = {
 
   offMessageDelivered(handler: MessageEventHandler): void {
     socket?.off(REALTIME_EVENTS.MESSAGE_DELIVERED, handler);
+  },
+
+  onMessageRead(handler: MessageEventHandler): void {
+    socket?.on(REALTIME_EVENTS.MESSAGE_READ, handler);
+  },
+
+  offMessageRead(handler: MessageEventHandler): void {
+    socket?.off(REALTIME_EVENTS.MESSAGE_READ, handler);
   },
 
   onConnect(handler: () => void): void {

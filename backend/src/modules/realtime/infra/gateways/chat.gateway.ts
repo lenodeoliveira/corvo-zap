@@ -6,13 +6,19 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { HttpException, Logger } from '@nestjs/common';
 import type { Server, Socket } from 'socket.io';
 import type { AuthUserPayload } from '@/modules/auth/domain/@types/auth-user.interface';
 import { ChatParticipantService } from '@/modules/chat/application/services/chat-participant.service';
+import { MarkMessageAsReadService } from '@/modules/messages/application/usecases/mark-message-as-read/mark.message.as.read.service';
+import type { MessageView } from '@/modules/messages/application/usecases/message-view/message.view.service';
 import { WsJwtGuard } from '../guards/ws-jwt.guard';
-import type { RealtimeEventPayload } from '../../constants/realtime.events';
+import {
+  REALTIME_CLIENT_EVENTS,
+  type RealtimeEventPayload,
+} from '../../constants/realtime.events';
 
 @WebSocketGateway({
   namespace: '/realtime',
@@ -30,6 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly wsJwtGuard: WsJwtGuard,
     private readonly chatParticipantService: ChatParticipantService,
+    private readonly markMessageAsReadService: MarkMessageAsReadService,
   ) {}
 
   handleConnection(client: Socket): void {
@@ -54,7 +61,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('joinChat')
+  @SubscribeMessage(REALTIME_CLIENT_EVENTS.JOIN_CHAT)
   async handleJoinChat(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { chatId: string },
@@ -68,6 +75,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(this.getChatRoom(payload.chatId));
 
     return { ok: true };
+  }
+
+  @SubscribeMessage(REALTIME_CLIENT_EVENTS.MARK_MESSAGE_READ)
+  async handleMarkMessageRead(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { messageId: string },
+  ): Promise<{ ok: true; message: MessageView }> {
+    const user = client.data.user as AuthUserPayload;
+
+    if (!payload?.messageId?.trim()) {
+      throw new WsException('messageId is required');
+    }
+
+    try {
+      const message = await this.markMessageAsReadService.execute(
+        payload.messageId,
+        user.id,
+      );
+
+      return { ok: true, message };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw new WsException(error.getResponse());
+      }
+
+      this.logger.error('Failed to mark message as read via WebSocket', {
+        messageId: payload.messageId,
+        userId: user.id,
+        error: error instanceof Error ? error.message : 'unknown',
+      });
+
+      throw new WsException('Failed to mark message as read');
+    }
   }
 
   emitToUser(

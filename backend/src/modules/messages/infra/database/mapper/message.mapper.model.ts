@@ -16,6 +16,8 @@ export class MessageMapper {
       originCityId: entity.getOriginCityId(),
       destinationCityId: entity.getDestinationCityId(),
       travelTimeMinutes: entity.getTravelTimeMinutes(),
+      deliveredAt: entity.getDeliveredAt(),
+      readAt: entity.getReadAt(),
     };
   }
 
@@ -37,6 +39,8 @@ export class MessageMapper {
         originCityId: model.originCityId,
         destinationCityId: model.destinationCityId,
         travelTimeMinutes: model.travelTimeMinutes,
+        deliveredAt: model.deliveredAt ?? null,
+        readAt: model.readAt ?? null,
       }),
     );
   }

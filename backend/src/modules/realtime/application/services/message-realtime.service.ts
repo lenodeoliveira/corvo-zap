@@ -78,6 +78,38 @@ export class MessageRealtimeService {
     );
   }
 
+  async notifyMessageRead(messageId: string): Promise<void> {
+    const message = await this.messageRepository.findById(messageId);
+
+    if (!message) {
+      this.logger.warn('Message not found for read notification', {
+        messageId,
+      });
+      return;
+    }
+
+    const chat = await this.chatRepository.findById(message.getChatId());
+
+    if (!chat) {
+      this.logger.warn('Chat not found for read notification', {
+        messageId,
+        chatId: message.getChatId(),
+      });
+      return;
+    }
+
+    const senderNames = await buildSenderNamesByUserId(this.userRepository, [
+      message.getSenderId(),
+    ]);
+
+    await this.emitMessageToParticipants(
+      REALTIME_EVENTS.MESSAGE_READ,
+      message,
+      chat,
+      senderNames[message.getSenderId()] ?? '',
+    );
+  }
+
   private async emitMessageToParticipants(
     event: string,
     message: MessageEntity,

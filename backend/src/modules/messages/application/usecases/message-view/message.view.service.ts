@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { MessageEntity } from '../../../domain/entities/message.entity';
-import { DeliveryStatus } from '@/modules/delivery/application/usecases/delivery.service';
+import {
+  MessageEntity,
+  MessageStatus,
+} from '../../../domain/entities/message.entity';
 import { TrackingService } from '@/modules/delivery/application/usecases/tracking.service';
 import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';
 
 export interface MessageTracking {
-  status: DeliveryStatus;
+  status: MessageStatus;
   progress: number;
   distanceKm: number;
   arrivalAt: Date;
   remainingMinutes: number;
   deliveredAt: Date | null;
+  readAt: Date | null;
 }
 
 export interface MessageView {
@@ -41,13 +44,16 @@ export class MessageViewService {
   ): MessageView {
     const isSender = message.getSenderId() === viewerUserId;
     const tracking = this.buildTracking(message);
+    const canRead =
+      tracking.status === MessageStatus.DELIVERED ||
+      tracking.status === MessageStatus.READ;
 
     const base = {
       id: message.getId(),
       chatId: message.getChatId(),
       senderId: message.getSenderId(),
       senderName,
-      canRead: tracking.status === DeliveryStatus.DELIVERED,
+      canRead,
       departureAt: message.getDepartureAt(),
       originCityId: message.getOriginCityId(),
       destinationCityId: message.getDestinationCityId(),
@@ -64,7 +70,7 @@ export class MessageViewService {
       };
     }
 
-    if (tracking.status === DeliveryStatus.TRAVELING) {
+    if (tracking.status === MessageStatus.TRAVELING) {
       return {
         ...base,
         content: 'Your raven is still flying.',
@@ -80,23 +86,35 @@ export class MessageViewService {
   }
 
   private buildTracking(message: MessageEntity): MessageTracking {
-    const tracking = this.trackingService.track({
-      distanceKm: message.getDistanceKm(),
-      travelTimeMinutes: message.getTravelTimeMinutes(),
-      departureAt: message.getDepartureAt(),
-      arrivalAt: message.getArrivalAt(),
-    });
+    const status = message.getStatus();
+
+    if (status === MessageStatus.TRAVELING) {
+      const tracking = this.trackingService.track({
+        distanceKm: message.getDistanceKm(),
+        travelTimeMinutes: message.getTravelTimeMinutes(),
+        departureAt: message.getDepartureAt(),
+        arrivalAt: message.getArrivalAt(),
+      });
+
+      return {
+        status,
+        progress: tracking.progress,
+        distanceKm: message.getDistanceKm(),
+        arrivalAt: message.getArrivalAt(),
+        remainingMinutes: tracking.remainingMinutes,
+        deliveredAt: null,
+        readAt: null,
+      };
+    }
 
     return {
-      status: tracking.status,
-      progress: tracking.progress,
+      status,
+      progress: 100,
       distanceKm: message.getDistanceKm(),
       arrivalAt: message.getArrivalAt(),
-      remainingMinutes: tracking.remainingMinutes,
-      deliveredAt:
-        tracking.status === DeliveryStatus.DELIVERED
-          ? message.getArrivalAt()
-          : null,
+      remainingMinutes: 0,
+      deliveredAt: message.getDeliveredAt(),
+      readAt: message.getReadAt(),
     };
   }
 }

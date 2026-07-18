@@ -83,9 +83,11 @@ export function formatChatTimestamp(message: Message | undefined): string | null
   }
 
   const referenceDate =
-    message.tracking.status === 'DELIVERED' && message.tracking.deliveredAt
-      ? new Date(message.tracking.deliveredAt)
-      : new Date(message.departureAt);
+    message.tracking.status === 'READ' && message.tracking.readAt
+      ? new Date(message.tracking.readAt)
+      : message.tracking.status === 'DELIVERED' && message.tracking.deliveredAt
+        ? new Date(message.tracking.deliveredAt)
+        : new Date(message.departureAt);
 
   const now = new Date();
   const diffMs = now.getTime() - referenceDate.getTime();

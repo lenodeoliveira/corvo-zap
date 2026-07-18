@@ -4,12 +4,11 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { MessageEntity } from '@/modules/messages/domain/entities/message.entity';
 import type IMessageRepository from '@/modules/messages/domain/repositories/interface-messages/message.repository.interface';
 import { Inject } from '@nestjs/common';
 import { MESSAGE_REPOSITORY } from '@/modules/messages/domain/tokens/message.repository.token';
-import { DOMAIN_EVENTS, MessageDeliveredEvent } from '@/modules/events';
+import { MarkMessageAsDeliveredService } from '@/modules/messages/application/usecases/mark-message-as-delivered/mark.message.as.delivered.service';
 
 @Injectable()
 export class DeliverySchedulerService implements OnModuleInit, OnModuleDestroy {
@@ -19,7 +18,7 @@ export class DeliverySchedulerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: IMessageRepository,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly markMessageAsDeliveredService: MarkMessageAsDeliveredService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -67,14 +66,11 @@ export class DeliverySchedulerService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private deliver(messageId: string): void {
+  private async deliver(messageId: string): Promise<void> {
     try {
-      this.eventEmitter.emit(
-        DOMAIN_EVENTS.MESSAGE_DELIVERED,
-        new MessageDeliveredEvent(messageId),
-      );
+      await this.markMessageAsDeliveredService.execute(messageId);
     } catch (error) {
-      this.logger.error('Failed to emit message delivery event', {
+      this.logger.error('Failed to deliver message', {
         messageId,
         error: error instanceof Error ? error.message : 'unknown',
       });

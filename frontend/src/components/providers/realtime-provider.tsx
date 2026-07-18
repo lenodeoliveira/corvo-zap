@@ -66,6 +66,7 @@ export function RealtimeProvider({ children }: PropsWithChildren) {
     realtimeService.onDisconnect(handleDisconnect);
     realtimeService.onMessageCreated(handleMessageEvent);
     realtimeService.onMessageDelivered(handleMessageEvent);
+    realtimeService.onMessageRead(handleMessageEvent);
 
     setConnected(realtimeService.isConnected());
 
@@ -74,6 +75,7 @@ export function RealtimeProvider({ children }: PropsWithChildren) {
       realtimeService.offDisconnect(handleDisconnect);
       realtimeService.offMessageCreated(handleMessageEvent);
       realtimeService.offMessageDelivered(handleMessageEvent);
+      realtimeService.offMessageRead(handleMessageEvent);
       realtimeService.disconnect();
       setConnected(false);
     };
