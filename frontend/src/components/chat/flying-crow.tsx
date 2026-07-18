@@ -4,7 +4,7 @@ import { Animated, StyleSheet, type StyleProp, type ViewStyle } from 'react-nati
 
 const SPRITE_ASPECT_RATIO = 175 / 187;
 
-export const FLYING_CROW_HEIGHT = 34;
+export const FLYING_CROW_HEIGHT = 26;
 export const FLYING_CROW_WIDTH = Math.round(FLYING_CROW_HEIGHT * SPRITE_ASPECT_RATIO);
 
 const crowFrames = [
@@ -57,7 +57,7 @@ export function FlyingCrow({ style }: FlyingCrowProps) {
       {
         translateY: bob.interpolate({
           inputRange: [0, 1],
-          outputRange: [0, -4],
+          outputRange: [0, -3],
         }),
       },
     ],
