@@ -18,10 +18,12 @@ import { ChatComposer } from '@/components/chat/chat-composer';
 import { ChatDetailHeader } from '@/components/chat/chat-detail-header';
 import { ChatMessageItem } from '@/components/chat/chat-message-item';
 import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
+import { useJoinChat } from '@/components/providers/realtime-provider';
 import { useTheme } from '@/hooks/use-theme';
 import { chatsService } from '@/services/chats.service';
 import { messagesService } from '@/services/messages.service';
 import { useAuthStore } from '@/store/auth-store';
+import { useRealtimeStore } from '@/store/realtime-store';
 import { theme } from '@/theme';
 import type { Message } from '@/types/api';
 import { getParticipantName } from '@/utils/chat-list';
@@ -39,7 +41,10 @@ export default function ChatScreen() {
   const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
   const currentUserId = useAuthStore((state) => state.user?.id ?? '');
+  const realtimeConnected = useRealtimeStore((state) => state.connected);
   const [draft, setDraft] = useState('');
+
+  useJoinChat(id);
 
   const { data: chats } = useQuery({
     queryKey: ['chats'],
@@ -55,7 +60,13 @@ export default function ChatScreen() {
     queryKey: ['messages', id],
     queryFn: () => messagesService.listByChat(id),
     enabled: Boolean(id),
-    refetchInterval: (query) => getMessagesRefetchInterval(query.state.data),
+    refetchInterval: (query) => {
+      if (realtimeConnected) {
+        return false;
+      }
+
+      return getMessagesRefetchInterval(query.state.data);
+    },
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });

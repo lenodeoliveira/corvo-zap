@@ -1,0 +1,9 @@
+export const REALTIME_EVENTS = {
+  MESSAGE_CREATED: 'message.created',
+  MESSAGE_DELIVERED: 'message.delivered',
+} as const;
+
+export type RealtimeEventPayload = {
+  chatId: string;
+  message: Record<string, unknown>;
+};

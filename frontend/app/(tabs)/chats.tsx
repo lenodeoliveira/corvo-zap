@@ -21,6 +21,7 @@ import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
 import { chatsService } from '@/services/chats.service';
 import { usersService } from '@/services/users.service';
 import { useAuthStore } from '@/store/auth-store';
+import { useRealtimeStore } from '@/store/realtime-store';
 import { theme } from '@/theme';
 import type { Chat, User } from '@/types/api';
 import { filterChats } from '@/utils/chat-list';
@@ -43,6 +44,7 @@ export default function ChatsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const currentUserId = useAuthStore((state) => state.user?.id ?? '');
+  const realtimeConnected = useRealtimeStore((state) => state.connected);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [userSearchMode, setUserSearchMode] = useState(false);
@@ -61,7 +63,13 @@ export default function ChatsScreen() {
   const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['chats'],
     queryFn: () => chatsService.listMine(),
-    refetchInterval: (query) => getChatsRefetchInterval(query.state.data),
+    refetchInterval: (query) => {
+      if (realtimeConnected) {
+        return false;
+      }
+
+      return getChatsRefetchInterval(query.state.data);
+    },
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
