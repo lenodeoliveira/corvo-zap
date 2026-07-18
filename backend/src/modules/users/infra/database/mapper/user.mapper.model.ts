@@ -1,4 +1,4 @@
-import { UserEntity } from "src/modules/users/domain/entities/user.entity";
+import { UserEntity } from "@/modules/users/domain/entities/user.entity";
 import { UserModel } from "@/modules/users/infra/database/typeorm/models/user.model";
 import { DeepPartial } from "typeorm";
 

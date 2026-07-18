@@ -1,10 +1,10 @@
-import type IUserRepository from "src/modules/users/domain/repositories/interface-users/user.repository.interface";
-import { UserSearchParams } from "src/modules/users/domain/repositories/interface-users/user-search.params";
+import type IUserRepository from "@/modules/users/domain/repositories/interface-users/user.repository.interface";
+import { UserSearchParams } from "@/modules/users/domain/repositories/interface-users/user-search.params";
 import { Repository } from "typeorm";
 import { UserModel } from "@/modules/users/infra/database/typeorm/models/user.model";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "src/modules/users/domain/entities/user.entity";
+import { UserEntity } from "@/modules/users/domain/entities/user.entity";
 import { UserMapper } from "../../mapper/user.mapper.model";
 
 @Injectable()
