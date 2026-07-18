@@ -51,4 +51,13 @@ export class MessagesRepository implements IMessageRepository {
 
     return MessageMapper.toDomain(messages);
   }
+
+  async findPendingDelivery(): Promise<MessageEntity[]> {
+    const messages = await this.messagesRepository
+      .createQueryBuilder('message')
+      .where('message.arrivalAt > :now', { now: new Date() })
+      .getMany();
+
+    return MessageMapper.toDomain(messages);
+  }
 }

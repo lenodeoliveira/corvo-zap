@@ -4,6 +4,7 @@ interface IMessageRepository {
   create(message: MessageEntity): Promise<void>;
   findById(id: string): Promise<MessageEntity | null>;
   findByChatId(chatId: string): Promise<MessageEntity[]>;
+  findPendingDelivery(): Promise<MessageEntity[]>;
 }
 
 export default IMessageRepository;

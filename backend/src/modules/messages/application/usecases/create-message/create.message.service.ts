@@ -5,6 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import type IMessageRepository from '../../../domain/repositories/interface-messages/message.repository.interface';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type ICityRepository from '@/modules/cities/domain/repositories/interface-cities/city.repository.interface';
@@ -17,6 +18,7 @@ import { DistanceService } from '@/modules/delivery/application/usecases/distanc
 import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';
 import { MessageViewService, type MessageView } from '../message-view/message.view.service';
 import { ChatParticipantService } from '@/modules/chat/application/services/chat-participant.service';
+import { DOMAIN_EVENTS, MessageCreatedEvent } from '@/modules/events';
 
 interface CreateMessageProps {
   chatId: string;
@@ -39,6 +41,7 @@ export class CreateMessageService {
     private readonly distanceService: DistanceService,
     private readonly cryptoMessageService: CryptoMessageService,
     private readonly messageViewService: MessageViewService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -105,6 +108,11 @@ export class CreateMessageService {
     });
 
     await this.messageRepository.create(message);
+
+    this.eventEmitter.emit(
+      DOMAIN_EVENTS.MESSAGE_CREATED,
+      new MessageCreatedEvent(message, chat, sender.getName()),
+    );
 
     return this.messageViewService.toView(
       message,
