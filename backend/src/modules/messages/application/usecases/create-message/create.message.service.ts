@@ -10,9 +10,9 @@ import type IMessageRepository from '../../../domain/repositories/interface-mess
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type ICityRepository from '@/modules/cities/domain/repositories/interface-cities/city.repository.interface';
 import { MessageEntity } from '../../../domain/entities/message.entity';
-import { MESSAGE_REPOSITORY } from '../../../infra/database/typeorm/tokens/message.token.repository';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
-import { CITY_REPOSITORY } from '@/modules/cities/infra/database/typeorm/tokens/city.token.repository';
+import { MESSAGE_REPOSITORY } from '@/modules/messages/domain/tokens/message.repository.token';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
+import { CITY_REPOSITORY } from '@/modules/cities/domain/tokens/city.repository.token';
 import { DeliveryService } from '@/modules/delivery/application/usecases/delivery.service';
 import { DistanceService } from '@/modules/delivery/application/usecases/distance.service';
 import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';

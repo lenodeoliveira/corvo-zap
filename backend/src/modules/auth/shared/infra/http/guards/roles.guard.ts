@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type { AuthUserPayload } from '../../../../domain/@types/auth-user.interface';
 

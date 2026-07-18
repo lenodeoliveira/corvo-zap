@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type IUserRepository from '../../../domain/repositories/interface-users/user.repository.interface';
 import { PaginatedUsers } from '../../../domain/repositories/interface-users/user-search.params';
-import { USER_REPOSITORY } from '../../../infra/database/typeorm/tokens/user.token.repository';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 
 type ListUsersInput = {
   search?: string;

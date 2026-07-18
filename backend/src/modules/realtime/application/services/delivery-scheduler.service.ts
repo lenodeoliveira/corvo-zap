@@ -8,7 +8,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { MessageEntity } from '@/modules/messages/domain/entities/message.entity';
 import type IMessageRepository from '@/modules/messages/domain/repositories/interface-messages/message.repository.interface';
 import { Inject } from '@nestjs/common';
-import { MESSAGE_REPOSITORY } from '@/modules/messages/infra/database/typeorm/tokens/message.token.repository';
+import { MESSAGE_REPOSITORY } from '@/modules/messages/domain/tokens/message.repository.token';
 import { DOMAIN_EVENTS, MessageDeliveredEvent } from '@/modules/events';
 
 @Injectable()

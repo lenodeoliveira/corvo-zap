@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ChatEntity } from '../../domain/entities/chat.entity';
 import type IChatRepository from '../../domain/repositories/interface-chat/chat.repository.interface';
-import { CHAT_REPOSITORY } from '../../infra/database/typeorm/tokens/chat.token.repository';
+import { CHAT_REPOSITORY } from '@/modules/chat/domain/tokens/chat.repository.token';
 
 interface RequireParticipantOptions {
   forbiddenMessage: string;

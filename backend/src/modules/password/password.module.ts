@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CRYPT_SERVICE } from './infra/gateway/crypt.token.service';
+import { CRYPT_SERVICE } from './domain/tokens/crypt.service.token';
 import { CryptInfraService } from './infra/gateway/crypt.infra.service';
 
 @Module({

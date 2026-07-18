@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type ICityRepository from '../../../domain/repositories/interface-cities/city.repository.interface';
-import { CITY_REPOSITORY } from '../../../infra/database/typeorm/tokens/city.token.repository';
+import { CITY_REPOSITORY } from '@/modules/cities/domain/tokens/city.repository.token';
 
 @Injectable()
 export class ListCitiesService {

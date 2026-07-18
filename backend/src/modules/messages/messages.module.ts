@@ -4,7 +4,7 @@ import { MessageModel } from './infra/database/typeorm/models/message.model';
 import { MessageControllers } from './interfaces/http/controllers/message.controllers';
 import { CreateMessageService } from './application/usecases/create-message/create.message.service';
 import { MessageViewService } from './application/usecases/message-view/message.view.service';
-import { MESSAGE_REPOSITORY } from './infra/database/typeorm/tokens/message.token.repository';
+import { MESSAGE_REPOSITORY } from './domain/tokens/message.repository.token';
 import { MessagesRepository } from './infra/database/typeorm/repositories/messages.repository';
 import { ChatModule } from '../chat/chat.module';
 import { UsersModule } from '../users/users.module';

@@ -5,7 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AUTH_TOKEN_SERVICE } from '../../../../infra/gateway/auth.token';
+import { AUTH_TOKEN_SERVICE } from '@/modules/auth/domain/tokens/auth-token.service.token';
 import type { IAuthToken } from '../../../../domain/gateways/auth.token.interface';
 import type { AuthUserPayload } from '../../../../domain/@types/auth-user.interface';
 

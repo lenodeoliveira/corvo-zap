@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import type IMessageRepository from '@/modules/messages/domain/repositories/interface-messages/message.repository.interface';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
-import { MESSAGE_REPOSITORY } from '@/modules/messages/infra/database/typeorm/tokens/message.token.repository';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
+import { MESSAGE_REPOSITORY } from '@/modules/messages/domain/tokens/message.repository.token';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 import { MessageViewService, type MessageView } from '@/modules/messages/application/usecases/message-view/message.view.service';
 import { ChatParticipantService } from '@/modules/chat/application/services/chat-participant.service';
 import { buildSenderNamesByUserId } from '../../shared/build-sender-names';

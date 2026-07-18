@@ -9,8 +9,8 @@ import {
 import type IChatRepository from '../../../domain/repositories/interface-chat/chat.repository.interface';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import { ChatEntity } from '../../../domain/entities/chat.entity';
-import { CHAT_REPOSITORY } from '../../../infra/database/typeorm/tokens/chat.token.repository';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
+import { CHAT_REPOSITORY } from '@/modules/chat/domain/tokens/chat.repository.token';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 
 interface CreateChatProps {
   userOneId: string;

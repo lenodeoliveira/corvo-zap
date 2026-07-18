@@ -2,9 +2,9 @@ import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type IEncryption from '@/modules/password/domain/gateways/crypt.interface';
 import { UserEntity } from '@/modules/users/domain/entities/user.entity';
-import { CRYPT_SERVICE } from '@/modules/password/infra/gateway/crypt.token.service';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
-import { AUTH_TOKEN_SERVICE } from '../../../infra/gateway/auth.token';
+import { CRYPT_SERVICE } from '@/modules/password/domain/tokens/crypt.service.token';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
+import { AUTH_TOKEN_SERVICE } from '@/modules/auth/domain/tokens/auth-token.service.token';
 import type { IAuthToken } from '../../../domain/gateways/auth.token.interface';
 
 interface LoginProps {

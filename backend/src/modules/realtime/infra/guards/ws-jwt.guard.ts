@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { Socket } from 'socket.io';
-import { AUTH_TOKEN_SERVICE } from '@/modules/auth/infra/gateway/auth.token';
+import { AUTH_TOKEN_SERVICE } from '@/modules/auth/domain/tokens/auth-token.service.token';
 import type { IAuthToken } from '@/modules/auth/domain/gateways/auth.token.interface';
 import type { AuthUserPayload } from '@/modules/auth/domain/@types/auth-user.interface';
 

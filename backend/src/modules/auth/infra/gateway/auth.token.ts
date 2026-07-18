@@ -1,1 +1,0 @@
-export const AUTH_TOKEN_SERVICE = 'AUTH_TOKEN_SERVICE';

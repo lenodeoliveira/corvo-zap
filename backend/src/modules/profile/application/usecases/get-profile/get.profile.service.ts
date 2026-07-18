@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type ICityRepository from '@/modules/cities/domain/repositories/interface-cities/city.repository.interface';
-import { CITY_REPOSITORY } from '@/modules/cities/infra/database/typeorm/tokens/city.token.repository';
+import { CITY_REPOSITORY } from '@/modules/cities/domain/tokens/city.repository.token';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 
 @Injectable()
 export class GetProfileService {

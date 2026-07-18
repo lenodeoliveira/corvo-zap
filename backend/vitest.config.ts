@@ -29,7 +29,7 @@ export default defineConfig({
         'src/modules/**/*.module.ts',
         'src/modules/**/infra/database/typeorm/models/**/*.ts',
         'src/modules/**/infra/database/typeorm/config/**/*.ts',
-        'src/modules/**/infra/database/typeorm/tokens/**/*.ts',
+        'src/modules/**/domain/tokens/**/*.ts',
         'src/modules/**/domain/@types/**/*.ts',
         'src/modules/**/database/typeorm/**/*.ts'
       ],

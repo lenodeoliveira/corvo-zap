@@ -3,15 +3,15 @@ import type { ChatEntity } from '@/modules/chat/domain/entities/chat.entity';
 import type { MessageEntity } from '@/modules/messages/domain/entities/message.entity';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type IChatRepository from '@/modules/chat/domain/repositories/interface-chat/chat.repository.interface';
-import { USER_REPOSITORY } from '@/modules/users/infra/database/typeorm/tokens/user.token.repository';
-import { CHAT_REPOSITORY } from '@/modules/chat/infra/database/typeorm/tokens/chat.token.repository';
+import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
+import { CHAT_REPOSITORY } from '@/modules/chat/domain/tokens/chat.repository.token';
 import {
   MessageViewService,
   type MessageView,
 } from '@/modules/messages/application/usecases/message-view/message.view.service';
 import { buildSenderNamesByUserId } from '@/modules/messaging-query/application/shared/build-sender-names';
 import type IMessageRepository from '@/modules/messages/domain/repositories/interface-messages/message.repository.interface';
-import { MESSAGE_REPOSITORY } from '@/modules/messages/infra/database/typeorm/tokens/message.token.repository';
+import { MESSAGE_REPOSITORY } from '@/modules/messages/domain/tokens/message.repository.token';
 import { ChatGateway } from '../../infra/gateways/chat.gateway';
 import {
   REALTIME_EVENTS,

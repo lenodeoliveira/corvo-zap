@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type ICityRepository from '../../../domain/repositories/interface-cities/city.repository.interface';
 import { CityEntity } from '../../../domain/entities/city.entity';
-import { CITY_REPOSITORY } from '../../../infra/database/typeorm/tokens/city.token.repository';
+import { CITY_REPOSITORY } from '@/modules/cities/domain/tokens/city.repository.token';
 
 interface CreateCityProps {
   name: string;
