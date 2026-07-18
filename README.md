@@ -263,10 +263,10 @@ Delivery --> Tracking
 
 ## Mobile
 
-* ⬜ React Native
-* ⬜ Login
-* ⬜ Lista de chats
-* ⬜ Tela de conversa
+* ✅ React Native
+* ✅ Login
+* ✅ Lista de chats
+* ✅ Tela de conversa
 * ⬜ Rastreamento do corvo
 * ⬜ Push Notifications
 
