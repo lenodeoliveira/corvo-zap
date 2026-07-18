@@ -11,6 +11,8 @@ import { DATABASE_ENTITIES } from './shared/infra/database/typeorm/entities';
 import { ConfigModule } from '@nestjs/config';
 import { ProfileModule } from './modules/profile/profile.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
+import { EventsModule } from './modules/events/events.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { DeliveryModule } from './modules/delivery/delivery.module';
     MessagingQueryModule,
     CitiesModule,
     DeliveryModule,
+    EventsModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [],
