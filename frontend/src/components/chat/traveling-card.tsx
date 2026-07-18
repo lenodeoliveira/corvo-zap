@@ -1,4 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '@/theme';
@@ -9,6 +10,8 @@ import {
 } from '@/utils/format-message';
 import type { LiveTracking } from '@/utils/message-tracking';
 
+import { FLYING_CROW_HEIGHT, FLYING_CROW_WIDTH, FlyingCrow } from './flying-crow';
+
 type TravelingCardProps = {
   departureAt: string;
   arrivalAt: string;
@@ -17,6 +20,12 @@ type TravelingCardProps = {
 
 export function TravelingCard({ departureAt, arrivalAt, liveTracking }: TravelingCardProps) {
   const { traveledKm, totalKm } = getDistanceProgress(liveTracking);
+  const [trackWidth, setTrackWidth] = useState(0);
+  const progressRatio = Math.max(0, Math.min(liveTracking.progress, 100)) / 100;
+  const crowLeft = Math.max(
+    0,
+    Math.min(trackWidth * progressRatio - FLYING_CROW_WIDTH / 2, trackWidth - FLYING_CROW_WIDTH),
+  );
 
   return (
     <View style={styles.wrapper}>
@@ -38,8 +47,23 @@ export function TravelingCard({ departureAt, arrivalAt, liveTracking }: Travelin
         </View>
 
         <View style={styles.progressHeader}>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${liveTracking.progress}%` }]} />
+          <View
+            style={styles.progressTrackContainer}
+            onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${liveTracking.progress}%` }]} />
+            </View>
+
+            {trackWidth > 0 ? (
+              <FlyingCrow
+                style={[
+                  styles.flyingCrow,
+                  {
+                    left: crowLeft,
+                  },
+                ]}
+              />
+            ) : null}
           </View>
           <Text style={styles.progressValue}>{liveTracking.progress}%</Text>
         </View>
@@ -122,12 +146,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  progressTrack: {
+  progressTrackContainer: {
     flex: 1,
+    justifyContent: 'center',
+    minHeight: FLYING_CROW_HEIGHT,
+  },
+  progressTrack: {
     height: 8,
     borderRadius: theme.radius.pill,
     backgroundColor: 'rgba(0, 0, 0, 0.12)',
     overflow: 'hidden',
+  },
+  flyingCrow: {
+    position: 'absolute',
+    top: (8 - FLYING_CROW_HEIGHT) / 2 - 2,
   },
   progressFill: {
     height: '100%',
