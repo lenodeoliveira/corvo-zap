@@ -22,49 +22,94 @@ O **Corvo-Zap** é um aplicativo de mensagens inspirado nos mensageiros medievai
 
 Diferente dos aplicativos tradicionais, uma mensagem não é entregue instantaneamente. Quando uma carta é enviada, um corvo inicia sua viagem entre duas cidades. Durante esse período, o remetente pode acompanhar a entrega, enquanto o destinatário precisa aguardar a chegada do corvo para ler o conteúdo.
 
-O projeto foi criado como um laboratório para estudo de arquitetura de software, Domain-Driven Design (DDD), NestJS e boas práticas de engenharia de software.
+O projeto foi criado como um laboratório para estudo de arquitetura de software, Domain-Driven Design (DDD), NestJS, React Native e boas práticas de engenharia de software.
 
 ---
 
 <p align="center">
 
 ![NestJS](https://img.shields.io/badge/NestJS-v11-E0234E?logo=nestjs)
+![Expo](https://img.shields.io/badge/Expo-57-000020?logo=expo)
+![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </p>
 
+---
+
+# Estrutura do projeto
+
+```
+corvo-zap/
+├── backend/     # API NestJS (REST + WebSocket)
+└── frontend/    # App mobile/web com Expo (React Native)
+```
+
+Documentação detalhada da API: [`backend/README.md`](./backend/README.md).
+
+---
+
 # Tecnologias
+
+## Backend
 
 * NestJS
 * TypeScript
 * TypeORM
 * SQLite
 * JWT Authentication
-* bcrypt
+* bcryptjs
 * Node Crypto (AES)
+* Socket.IO (WebSocket)
+* Event Emitter (eventos de domínio)
 * Swagger
+* Vitest
+
+## Frontend
+
+* Expo 57
+* React Native
+* Expo Router
+* TypeScript
+* TanStack Query
+* Zustand
+* Socket.IO Client
 
 ---
 
 # Arquitetura
 
+## Módulos do backend
+
 ```
-src
-│
-├── auth
-├── users
-├── cities
-├── chats
-├── messages
-├── crypto
-├── distance
-├── delivery
-└── tracking
+src/modules/
+├── auth              # Login e JWT
+├── users             # Cadastro e listagem de usuários
+├── profile           # Perfil do usuário autenticado
+├── cities            # Cidades e coordenadas no mapa
+├── chat              # Conversas entre dois usuários
+├── messages          # Comandos de mensagem (envio, entrega, leitura)
+├── messaging-query   # Consultas de mensagens e chats (leitura)
+├── crypto            # Criptografia do conteúdo
+├── password          # Hash de senhas
+├── delivery          # Distância, tempo de viagem, rastreamento e agendamento
+├── events            # Eventos de domínio (created, delivered, read)
+└── realtime          # WebSocket e notificações em tempo real
 ```
 
-Cada módulo possui uma única responsabilidade, seguindo princípios de Clean Architecture e SOLID.
+Cada módulo possui uma única responsabilidade, seguindo princípios de Clean Architecture e SOLID. A separação entre `messages` (escrita) e `messaging-query` (leitura) organiza comandos e consultas de forma explícita.
+
+## Camadas por módulo
+
+```
+application/usecases   → orquestração da regra de negócio
+domain                 → entidades, contratos e tipos
+infra                  → TypeORM, gateways e integrações
+interfaces/http        → controllers REST e DTOs
+shared/infra/http      → guards, decorators e filtros
+```
 
 ---
 
@@ -75,21 +120,25 @@ flowchart TD
 
 A[Usuário escreve uma mensagem]
 
-A --> B[Busca remetente]
+A --> B[Busca remetente e destinatário]
 
-B --> C[Busca destinatário]
+B --> C[Obtém cidades]
 
-C --> D[Obtém cidades]
+C --> D[DistanceService]
 
-D --> E[DistanceService]
+D --> E[DeliveryService]
 
-E --> F[DeliveryService]
+E --> F[CryptoService]
 
-F --> G[CryptoService]
+F --> G[Salva Message]
 
-G --> H[Salva Message]
+G --> H[Emite message.created]
 
-H --> I[Corvo inicia viagem]
+H --> I[Agenda entrega automática]
+
+I --> J[Notifica participantes via WebSocket]
+
+J --> K[Corvo inicia viagem]
 ```
 
 ---
@@ -101,20 +150,38 @@ flowchart TD
 
 A[Usuário abre mensagem]
 
-A --> B[TrackingService]
+A --> B[MessageViewService]
 
 B --> C{É o remetente?}
 
 C -->|Sim| D[Descriptografa]
 
-C -->|Não| E{Entrega concluída?}
+C -->|Não| E{Status DELIVERED ou READ?}
 
-E -->|Não| F[Retorna rastreamento]
+E -->|Não| F[Retorna rastreamento / TravelingCard]
 
 E -->|Sim| D
 
 D --> G[Exibe conteúdo]
+
+G --> H[Destinatário marca como lida via WebSocket]
 ```
+
+---
+
+# Tempo real
+
+O app mantém uma conexão WebSocket (`/realtime`) autenticada com JWT.
+
+| Evento | Direção | Descrição |
+|---|---|---|
+| `joinChat` | Cliente → Servidor | Entra na sala do chat |
+| `markMessageRead` | Cliente → Servidor | Marca mensagem como lida |
+| `message.created` | Servidor → Cliente | Nova mensagem enviada |
+| `message.delivered` | Servidor → Cliente | Corvo chegou ao destino |
+| `message.read` | Servidor → Cliente | Mensagem lida pelo destinatário |
+
+Quando o WebSocket está ativo, o frontend deixa de fazer polling e atualiza chats e mensagens instantaneamente.
 
 ---
 
@@ -126,49 +193,41 @@ D --> G[Exibe conteúdo]
 * Login
 * JWT
 * Associação com cidade
+* Busca paginada por nome ou e-mail
 
----
+## Perfil
+
+* Consulta do perfil autenticado (`/profile/me`)
+* Exibição da cidade do usuário
 
 ## Chats
 
 * Criar chat
 * Listar chats do usuário
-
----
+* Buscar usuários para iniciar conversa
 
 ## Mensagens
 
 * Enviar mensagens
 * Conteúdo criptografado
-* Rastreamento em tempo real
-
----
+* Status: `TRAVELING`, `DELIVERED`, `READ`
+* Entrega automática agendada
+* Confirmação de leitura
+* Rastreamento em tempo real (WebSocket + progresso ao vivo)
 
 ## Cidades
 
 * Listagem
-* Cadastro (Admin)
+* Cadastro e atualização (Admin)
 
----
-
-## Distância
+## Distância e entrega
 
 Calcula automaticamente:
 
-* distância
+* distância entre cidades
 * tempo de viagem
-
----
-
-## Entrega
-
-Calcula automaticamente:
-
-* partida
-* chegada
-* status
-
----
+* partida e chegada prevista
+* progresso da viagem
 
 ## Rastreamento
 
@@ -182,9 +241,13 @@ Exemplo:
   "progress": 67,
   "distanceKm": 1484,
   "remainingMinutes": 367,
-  "arrivalAt": "2026-07-12T15:27:02Z"
+  "arrivalAt": "2026-07-12T15:27:02Z",
+  "deliveredAt": null,
+  "readAt": null
 }
 ```
+
+No app mobile, mensagens em trânsito exibem o **TravelingCard** com barra de progresso, distância percorrida e tempo restante.
 
 ---
 
@@ -199,10 +262,12 @@ User "1" --> "*" Chat
 
 Chat "1" --> "*" Message
 
-Message --> Delivery
-
-Delivery --> Tracking
+Message : TRAVELING
+Message : DELIVERED
+Message : READ
 ```
+
+A entrega e o rastreamento fazem parte do ciclo de vida da `Message`, orquestrados pelo módulo `delivery` e propagados via `events` + `realtime`.
 
 ---
 
@@ -213,26 +278,58 @@ Delivery --> Tracking
   "id": "...",
   "chatId": "...",
   "senderId": "...",
-
+  "senderName": "João",
+  "canRead": true,
   "departureAt": "...",
-
   "originCityId": "...",
   "destinationCityId": "...",
-
   "travelTimeMinutes": 1113,
-
   "tracking": {
     "status": "DELIVERED",
     "progress": 100,
     "distanceKm": 1484,
     "remainingMinutes": 0,
     "arrivalAt": "...",
-    "deliveredAt": "..."
+    "deliveredAt": "...",
+    "readAt": null
   },
-
   "content": "Tudo certo e com você?"
 }
 ```
+
+---
+
+# Como rodar
+
+## Backend
+
+```bash
+cd backend
+npm install
+
+# .env
+JWT_SECRET=sua-chave-secreta
+PORT=3000
+
+npm run start:dev
+```
+
+API: `http://localhost:3000`  
+Swagger: `http://localhost:3000/api/docs`
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+
+# .env (copie de .env.example)
+EXPO_PUBLIC_API_URL=http://localhost:3000
+
+npm start
+```
+
+No emulador Android, use `http://10.0.2.2:3000`. Em dispositivo físico na mesma rede, use o IP da máquina.
 
 ---
 
@@ -242,6 +339,7 @@ Delivery --> Tracking
 
 * ✅ Cadastro de usuários
 * ✅ Login JWT
+* ✅ Perfil do usuário
 * ✅ Cadastro de cidades
 * ✅ Chats
 * ✅ Mensagens
@@ -249,11 +347,16 @@ Delivery --> Tracking
 * ✅ Cálculo de distância
 * ✅ Agendamento da entrega
 * ✅ Rastreamento da viagem
+* ✅ Eventos de domínio
+* ✅ WebSocket (tempo real)
+* ✅ Confirmação de leitura
+* ✅ Separação comando/consulta (`messages` / `messaging-query`)
 
 ### Próximos passos
 
-* ⬜ Testes unitários
-* ⬜ Testes E2E
+* 🟡 Testes unitários (entidades de domínio)
+* 🟡 Testes E2E (spec inicial)
+* ⬜ Cobertura completa de use cases
 * ⬜ Docker
 * ⬜ Refresh Token
 * ⬜ Rate Limiting
@@ -263,11 +366,14 @@ Delivery --> Tracking
 
 ## Mobile
 
-* ✅ React Native
-* ✅ Login
+* ✅ Expo / React Native
+* ✅ Login e cadastro
 * ✅ Lista de chats
 * ✅ Tela de conversa
-* ⬜ Rastreamento do corvo
+* ✅ Busca de usuários
+* ✅ Perfil
+* ✅ Rastreamento do corvo (TravelingCard)
+* ✅ Tempo real via WebSocket
 * ⬜ Push Notifications
 
 ---
@@ -294,13 +400,13 @@ Controller --> UseCase
 
 UseCase --> Repository
 
-UseCase --> DistanceService
+UseCase --> DomainService
 
-UseCase --> DeliveryService
+UseCase --> EventEmitter
 
-UseCase --> TrackingService
+EventEmitter --> Listener
 
-UseCase --> CryptoService
+Listener --> RealtimeGateway
 
 Repository --> SQLite
 ```
@@ -315,12 +421,15 @@ Este projeto tem como principal objetivo estudar:
 * Clean Architecture
 * DDD
 * SOLID
+* CQRS leve (comando vs consulta)
+* Eventos de domínio
 * NestJS
 * TypeORM
+* WebSockets
 * Autenticação JWT
 * Criptografia
 * Testes automatizados
-* React Native
+* React Native / Expo
 * AWS
 
 utilizando um domínio divertido e diferente dos tradicionais sistemas CRUD.
