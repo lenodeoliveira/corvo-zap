@@ -1,11 +1,14 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import type IMessageRepository from '../../../domain/repositories/interface-messages/message.repository.interface';
 import type IUserRepository from '@/modules/users/domain/repositories/interface-users/user.repository.interface';
 import type ICityRepository from '@/modules/cities/domain/repositories/interface-cities/city.repository.interface';
@@ -42,6 +45,8 @@ export class CreateMessageService {
     private readonly cryptoMessageService: CryptoMessageService,
     private readonly messageViewService: MessageViewService,
     private readonly eventEmitter: EventEmitter2,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(
@@ -91,7 +96,7 @@ export class CreateMessageService {
       originCity.getCoordinate(),
       destinationCity.getCoordinate(),
     );
-
+    
     const delivery = this.deliveryService.scheduleDelivery(travelTimeMinutes);
     const encryptedContent = this.cryptoMessageService.encrypt(input.content);
 
@@ -106,8 +111,19 @@ export class CreateMessageService {
       destinationCityId,
       travelTimeMinutes,
     });
+    
+    await this.dataSource.transaction(async (manager) => {
+      const reservedCrow = await this.userRepository.reserveCrow(
+        authenticatedUserId,
+        manager,
+      );
 
-    await this.messageRepository.create(message);
+      if (!reservedCrow) {
+        throw new ConflictException('Sender does not have available crows');
+      }
+
+      await this.messageRepository.create(message, manager);
+    });
 
     this.eventEmitter.emit(
       DOMAIN_EVENTS.MESSAGE_CREATED,

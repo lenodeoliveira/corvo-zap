@@ -3,7 +3,7 @@ import { MessageEntity, MessageStatus } from '@/modules/messages/domain/entities
 import { MessageModel } from '@/modules/messages/infra/database/typeorm/models/message.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { MessageMapper } from '../../mapper/message.mapper.model';
 
 @Injectable()
@@ -13,10 +13,11 @@ export class MessagesRepository implements IMessageRepository {
     private readonly messagesRepository: Repository<MessageModel>,
   ) {}
 
-  async create(message: MessageEntity): Promise<void> {
+  async create(message: MessageEntity, manager?: EntityManager): Promise<void> {
     const messageModel = MessageMapper.toModel(message);
+    const repository = manager?.getRepository(MessageModel) ?? this.messagesRepository;
 
-    await this.messagesRepository.save({
+    await repository.save({
       id: messageModel.id,
       chatId: messageModel.chatId,
       senderId: messageModel.senderId,
@@ -53,6 +54,26 @@ export class MessagesRepository implements IMessageRepository {
       readAt: messageModel.readAt,
       updatedAt: new Date(),
     });
+  }
+
+  async markAsDeliveredIfTraveling(
+    messageId: string,
+    manager?: EntityManager,
+  ): Promise<boolean> {
+    const repository = manager?.getRepository(MessageModel) ?? this.messagesRepository;
+    const result = await repository
+      .createQueryBuilder()
+      .update(MessageModel)
+      .set({
+        status: MessageStatus.DELIVERED,
+        deliveredAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where('id = :messageId', { messageId })
+      .andWhere('status = :status', { status: MessageStatus.TRAVELING })
+      .execute();
+
+    return result.affected === 1;
   }
 
   async findById(id: string): Promise<MessageEntity | null> {

@@ -24,6 +24,7 @@ import { useJoinChat } from '@/components/providers/realtime-provider';
 import { useTheme } from '@/hooks/use-theme';
 import { chatsService } from '@/services/chats.service';
 import { messagesService } from '@/services/messages.service';
+import { usersService } from '@/services/users.service';
 import { useAuthStore } from '@/store/auth-store';
 import { useRealtimeStore } from '@/store/realtime-store';
 import { theme } from '@/theme';
@@ -55,6 +56,12 @@ export default function ChatScreen() {
     queryFn: () => chatsService.listMine(),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ['profile', currentUserId],
+    queryFn: () => usersService.getProfile(),
+    enabled: Boolean(currentUserId),
+  });
+
   const {
     data,
     isLoading,
@@ -78,7 +85,8 @@ export default function ChatScreen() {
   const handleMessageDelivered = useCallback(() => {
     void refetch();
     void queryClient.invalidateQueries({ queryKey: ['chats'] });
-  }, [queryClient, refetch]);
+    void queryClient.invalidateQueries({ queryKey: ['profile', currentUserId] });
+  }, [currentUserId, queryClient, refetch]);
 
   useRefetchOnAppFocus(() => {
     void refetch();
@@ -91,6 +99,7 @@ export default function ChatScreen() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['messages', id] }),
         queryClient.invalidateQueries({ queryKey: ['chats'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile', currentUserId] }),
       ]);
     },
   });
@@ -163,7 +172,7 @@ export default function ChatScreen() {
   function handleSend() {
     const content = draft.trim();
 
-    if (!content || sendMutation.isPending) {
+    if (!content || sendMutation.isPending || (profile?.availableCrows ?? 0) === 0) {
       return;
     }
 
@@ -217,6 +226,7 @@ export default function ChatScreen() {
         )}
 
         <ChatComposer
+          availableCrows={profile?.availableCrows ?? 0}
           sending={sendMutation.isPending}
           value={draft}
           onChangeText={setDraft}

@@ -76,4 +76,5 @@ export type City = {
 
 export type UserProfile = User & {
   city: City | null;
+  availableCrows: number;
 };

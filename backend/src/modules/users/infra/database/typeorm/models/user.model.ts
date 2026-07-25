@@ -23,6 +23,9 @@ export class UserModel {
     @Column({ name: 'city_id', nullable: true })
     cityId?: string;
 
+    @Column({ name: 'available_crows', type: 'int', default: 3 })
+    availableCrows!: number;
+
     @Column({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
     createdAt!: Date;
 

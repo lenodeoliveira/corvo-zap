@@ -10,6 +10,7 @@ export class UserMapper {
             email: entity.getEmail(),
             password: entity.getPassword(),
             cityId: entity.getCityId(),
+            availableCrows: entity.getAvailableCrows(),
         }
     } 
 
@@ -26,6 +27,7 @@ export class UserMapper {
                 role: model!.role!,
                 status: model!.status!,
                 cityId: model.cityId,
+                availableCrows: model.availableCrows,
             })
         })
 

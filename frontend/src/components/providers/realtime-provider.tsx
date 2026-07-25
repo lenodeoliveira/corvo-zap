@@ -16,6 +16,7 @@ function toMessage(payload: RealtimeEventPayload): Message {
 export function RealtimeProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
   const token = useAuthStore((state) => state.token);
+  const currentUserId = useAuthStore((state) => state.user?.id);
   const isHydrated = useAuthStore((state) => state.isHydrated);
   const setConnected = useRealtimeStore((state) => state.setConnected);
 
@@ -52,6 +53,15 @@ export function RealtimeProvider({ children }: PropsWithChildren) {
           };
         });
       });
+
+      if (
+        message.senderId === currentUserId &&
+        message.tracking.status === 'DELIVERED'
+      ) {
+        void queryClient.invalidateQueries({
+          queryKey: ['profile', currentUserId],
+        });
+      }
     }
 
     function handleConnect() {
@@ -79,7 +89,7 @@ export function RealtimeProvider({ children }: PropsWithChildren) {
       realtimeService.disconnect();
       setConnected(false);
     };
-  }, [isHydrated, queryClient, setConnected, token]);
+  }, [currentUserId, isHydrated, queryClient, setConnected, token]);
 
   return children;
 }

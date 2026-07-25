@@ -1,6 +1,6 @@
 import type IUserRepository from "@/modules/users/domain/repositories/interface-users/user.repository.interface";
 import { UserSearchParams } from "@/modules/users/domain/repositories/interface-users/user-search.params";
-import { Repository } from "typeorm";
+import { EntityManager, Repository } from "typeorm";
 import { UserModel } from "@/modules/users/infra/database/typeorm/models/user.model";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -25,6 +25,7 @@ export class UsersRepository implements IUserRepository {
             role: userModel.role,
             status: userModel.status,
             cityId: userModel.cityId,
+            availableCrows: userModel.availableCrows,
         });
 
         return;
@@ -84,5 +85,32 @@ export class UsersRepository implements IUserRepository {
         const [userEntity] = UserMapper.toDomain([user]);
 
         return userEntity ?? null;
+    }
+
+    async reserveCrow(id: string, manager?: EntityManager): Promise<boolean> {
+        const repository = manager?.getRepository(UserModel) ?? this.usersRepository;
+        const result = await repository
+            .createQueryBuilder()
+            .update(UserModel)
+            .set({ availableCrows: () => 'available_crows - 1' })
+            .where('idUser = :id', { id })
+            .andWhere('available_crows > 0')
+            .execute();
+
+        return result.affected === 1;
+    }
+
+    async restoreCrow(id: string, manager?: EntityManager): Promise<void> {
+        const repository = manager?.getRepository(UserModel) ?? this.usersRepository;
+
+        await repository
+            .createQueryBuilder()
+            .update(UserModel)
+            .set({
+                availableCrows: () =>
+                    'CASE WHEN available_crows < 3 THEN available_crows + 1 ELSE 3 END',
+            })
+            .where('idUser = :id', { id })
+            .execute();
     }
 }

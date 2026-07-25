@@ -8,6 +8,7 @@ export interface UserEntityProps {
   role: string;
   status: string;
   cityId?: string;
+  availableCrows?: number;
 }
 
 export class UserEntity {
@@ -18,6 +19,7 @@ export class UserEntity {
   private status: string;
   private passwordHash: string;
   private cityId?: string;
+  private availableCrows: number;
 
   private constructor(props: UserEntityProps) {
     this.id = props.id || uuidv4();
@@ -27,6 +29,7 @@ export class UserEntity {
     this.role = props.role;
     this.status = props.status;
     this.cityId = props.cityId;
+    this.availableCrows = props.availableCrows ?? 3;
   }
 
   public getId(): string {
@@ -73,12 +76,42 @@ export class UserEntity {
     this.cityId = cityId;
   }
 
+  public getAvailableCrows(): number {
+    return this.availableCrows;
+  }
+
+  public incrementAvailableCrows(): void {
+    this.availableCrows++;
+    if (this.availableCrows > 3) {
+      this.availableCrows = 3;
+    }
+  }
+
+  public resetAvailableCrows(): void {
+    this.availableCrows = 3;
+  }
+
+  public isAvailableCrows(): boolean {
+    return this.availableCrows > 0;
+  }
+
+  public decrementAvailableCrowsIfAvailable(): void {
+    if (this.isAvailableCrows()) {
+      this.availableCrows--;
+    }
+  }
+
+  public decrementAvailableCrows(): void {
+    this.availableCrows--;
+  }
+
   public toJSON(): Record<string, unknown> {
     return {
       id: this.id,
       name: this.name,
       email: this.email,
       cityId: this.cityId,
+      availableCrows: this.availableCrows,
     };
   }
 

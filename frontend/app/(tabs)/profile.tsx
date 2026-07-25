@@ -79,6 +79,13 @@ export default function ProfileScreen() {
         ) : (
           <Text style={[styles.value, { color: theme.text }]}>{cityLabel}</Text>
         )}
+
+        <Text style={[styles.label, { color: theme.textSecondary }]}>
+          Corvos disponíveis
+        </Text>
+        <Text style={[styles.value, { color: theme.text }]}>
+          {profile?.availableCrows ?? '—'}
+        </Text>
       </View>
     </View>
   );

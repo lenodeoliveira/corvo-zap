@@ -1,5 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { theme } from '@/theme';
 
@@ -8,10 +8,17 @@ type ChatComposerProps = {
   onChangeText: (value: string) => void;
   onSend: () => void;
   sending?: boolean;
+  availableCrows: number;
 };
 
-export function ChatComposer({ value, onChangeText, onSend, sending = false }: ChatComposerProps) {
-  const canSend = value.trim().length > 0 && !sending;
+export function ChatComposer({
+  value,
+  onChangeText,
+  onSend,
+  sending = false,
+  availableCrows,
+}: ChatComposerProps) {
+  const canSend = value.trim().length > 0 && !sending && availableCrows > 0;
 
   return (
     <View style={styles.container}>
@@ -31,17 +38,20 @@ export function ChatComposer({ value, onChangeText, onSend, sending = false }: C
         onChangeText={onChangeText}
       />
 
-      <Pressable
-        accessibilityLabel="Enviar mensagem"
-        disabled={!canSend}
-        onPress={onSend}
-        style={({ pressed }) => [
-          styles.actionButton,
-          !canSend && styles.actionButtonDisabled,
-          pressed && canSend && styles.actionButtonPressed,
-        ]}>
-        <Feather name="feather" size={20} color={theme.colors.black} />
-      </Pressable>
+      <View style={styles.sendAction}>
+        <Text style={styles.crowCount}>{availableCrows}</Text>
+        <Pressable
+          accessibilityLabel={`Enviar mensagem. ${availableCrows} corvos disponíveis`}
+          disabled={!canSend}
+          onPress={onSend}
+          style={({ pressed }) => [
+            styles.actionButton,
+            !canSend && styles.actionButtonDisabled,
+            pressed && canSend && styles.actionButtonPressed,
+          ]}>
+          <Feather name="feather" size={20} color={theme.colors.black} />
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -71,6 +81,18 @@ const styles = StyleSheet.create({
   },
   actionButtonDisabled: {
     opacity: 0.45,
+  },
+  sendAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  crowCount: {
+    minWidth: 16,
+    color: theme.colors.text.secondary,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    fontSize: theme.typography.fontSize.md,
+    textAlign: 'center',
   },
   input: {
     flex: 1,
