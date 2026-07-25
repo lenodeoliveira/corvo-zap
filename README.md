@@ -351,6 +351,7 @@ No emulador Android, use `http://10.0.2.2:3000`. Em dispositivo físico na mesma
 * ✅ WebSocket (tempo real)
 * ✅ Confirmação de leitura
 * ✅ Separação comando/consulta (`messages` / `messaging-query`)
+* ✅ Disponibilização de corvos 🐦‍
 
 ### Próximos passos
 
