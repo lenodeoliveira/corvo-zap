@@ -375,6 +375,7 @@ No emulador Android, use `http://10.0.2.2:3000`. Em dispositivo físico na mesma
 * ✅ Perfil
 * ✅ Rastreamento do corvo (TravelingCard)
 * ✅ Tempo real via WebSocket
+* ✅ Validação de corvos enviados e disponibilização em tempo real de corvos
 * ⬜ Push Notifications
 
 ---
