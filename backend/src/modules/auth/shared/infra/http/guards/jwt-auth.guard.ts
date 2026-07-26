@@ -13,7 +13,7 @@ import type { AuthUserPayload } from '../../../../domain/@types/auth-user.interf
 export class JwtAuthGuard implements CanActivate {
   constructor(
     @Inject(AUTH_TOKEN_SERVICE)
-    private readonly authTokenService: IAuthToken,
+    private readonly authTokenService: IAuthToken<AuthUserPayload>,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -31,7 +31,7 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = this.authTokenService.verifyToken(token) as AuthUserPayload;
+      const payload = this.authTokenService.verifyToken(token);
 
       if (!payload?.id) {
         throw new UnauthorizedException('Invalid token payload');

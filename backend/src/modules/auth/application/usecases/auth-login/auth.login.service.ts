@@ -6,6 +6,7 @@ import { CRYPT_SERVICE } from '@/modules/password/domain/tokens/crypt.service.to
 import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.token';
 import { AUTH_TOKEN_SERVICE } from '@/modules/auth/domain/tokens/auth-token.service.token';
 import type { IAuthToken } from '../../../domain/gateways/auth.token.interface';
+import type { AuthUserPayload } from '../../../domain/@types/auth-user.interface';
 
 interface LoginProps {
   email: string;
@@ -22,7 +23,7 @@ export class AuthLoginService {
     @Inject(CRYPT_SERVICE)
     private readonly cryptography: IEncryption,
     @Inject(AUTH_TOKEN_SERVICE)
-    private readonly authTokenService: IAuthToken,
+    private readonly authTokenService: IAuthToken<AuthUserPayload>,
   ) {}
 
   async execute(input: LoginProps): Promise<{ user: UserEntity; token: string } | null> {

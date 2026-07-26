@@ -9,7 +9,7 @@ export class AuthLoginDTO {
     type: String,
     example: 'john@example.com',
   })
-  email: string;
+  email!: string;
 
   @IsNotEmpty()
   @MinLength(6)
@@ -18,5 +18,5 @@ export class AuthLoginDTO {
     type: String,
     example: 'qwert56',
   })
-  password: string;
+  password!: string;
 }

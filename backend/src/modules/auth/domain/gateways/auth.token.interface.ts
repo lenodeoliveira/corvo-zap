@@ -1,4 +1,4 @@
-export interface IAuthToken {
-  generateToken(payload: Record<string, unknown>): string;
-  verifyToken(token: string): unknown;
+export interface IAuthToken<T> {
+  generateToken(payload: T): string;
+  verifyToken(token: string): T;
 }
