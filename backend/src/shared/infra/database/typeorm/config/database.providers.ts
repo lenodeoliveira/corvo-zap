@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
@@ -37,6 +38,8 @@ export type SupportedDatabaseConfig =
   | MysqlDatabaseConfig
   | PostgresDatabaseConfig;
 
+type SupportedDatabaseType = SupportedDatabaseConfig['type'];
+
 function getSharedDatabaseOptions(
   config: SupportedDatabaseConfig,
 ): Pick<DataSourceOptions, 'entities' | 'synchronize' | 'dropSchema'> {
@@ -45,6 +48,65 @@ function getSharedDatabaseOptions(
     synchronize: config.synchronize ?? true,
     dropSchema: config.dropSchema ?? false,
   };
+}
+
+function requireEnv(configService: ConfigService, key: string): string {
+  const value = configService.get<string>(key);
+
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+
+  return value;
+}
+
+export function buildDatabaseConfigFromEnv(
+  configService: ConfigService,
+  entities: DataSourceOptions['entities'],
+): SupportedDatabaseConfig {
+  const type = configService.get<SupportedDatabaseType>('DB_TYPE', 'sqlite');
+
+  const common = {
+    entities,
+    synchronize: configService.get<string>('DB_SYNCHRONIZE', 'true') !== 'false',
+    dropSchema: configService.get<string>('DB_DROP_SCHEMA', 'false') === 'true',
+  };
+
+  switch (type) {
+    case 'sqlite':
+      return {
+        type: 'sqlite',
+        database: configService.get<string>('DB_DATABASE', 'corvozap.sqlite'),
+        ...common,
+      };
+
+    case 'mysql':
+      return {
+        type: 'mysql',
+        host: requireEnv(configService, 'DB_HOST'),
+        port: configService.get<number>('DB_PORT', 3306),
+        username: requireEnv(configService, 'DB_USERNAME'),
+        password: requireEnv(configService, 'DB_PASSWORD'),
+        database: requireEnv(configService, 'DB_DATABASE'),
+        ...common,
+      };
+
+    case 'postgres':
+      return {
+        type: 'postgres',
+        host: requireEnv(configService, 'DB_HOST'),
+        port: configService.get<number>('DB_PORT', 5432),
+        username: requireEnv(configService, 'DB_USERNAME'),
+        password: requireEnv(configService, 'DB_PASSWORD'),
+        database: requireEnv(configService, 'DB_DATABASE'),
+        schema: configService.get<string>('DB_SCHEMA'),
+        ssl: configService.get<string>('DB_SSL', 'false') === 'true',
+        ...common,
+      };
+
+    default:
+      throw new Error(`Unsupported DB_TYPE: ${type as string}`);
+  }
 }
 
 export function createDatabaseOptions(
@@ -89,17 +151,3 @@ export function createDatabaseOptions(
 export function createDataSource(config: SupportedDatabaseConfig) {
   return new DataSource(createDatabaseOptions(config) as DataSourceOptions);
 }
-
-export function createDatabaseProvider(config: SupportedDatabaseConfig) {
-  return {
-    provide: 'DATA_SOURCE',
-    useFactory: async () => createDataSource(config).initialize(),
-  };
-}
-
-export const databaseProviders = [
-  createDatabaseProvider({
-    type: 'sqlite',
-    database: 'database.sqlite',
-  }),
-];
