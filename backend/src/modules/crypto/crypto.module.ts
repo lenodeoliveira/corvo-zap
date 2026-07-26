@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { CryptoMessageService } from './domain/service/crypto.message.service';
+import { ContentEncryptionService } from './infra/gateway/content.encryption.service';
+import { CONTENT_ENCRYPTION_SERVICE } from './domain/tokens/content.encryption.token';
 
 @Module({
   imports: [],
-  providers: [CryptoMessageService],
-  exports: [CryptoMessageService],
+  providers: [{
+    provide: CONTENT_ENCRYPTION_SERVICE,
+    useClass: ContentEncryptionService,
+  }],
+  exports: [CONTENT_ENCRYPTION_SERVICE],
 })
 export class CryptoModule {}

@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   MessageEntity,
   MessageStatus,
 } from '../../../domain/entities/message.entity';
 import { TrackingService } from '@/modules/delivery/application/usecases/tracking.service';
 import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';
+import type IContentEncryption from '@/modules/crypto/domain/gateways/content.encryption';
+import { CONTENT_ENCRYPTION_SERVICE } from '@/modules/crypto/domain/tokens/content.encryption.token';
 
 export interface MessageTracking {
   status: MessageStatus;
@@ -34,7 +36,8 @@ export interface MessageView {
 export class MessageViewService {
   constructor(
     private readonly trackingService: TrackingService,
-    private readonly cryptoMessageService: CryptoMessageService,
+    @Inject(CONTENT_ENCRYPTION_SERVICE)
+    private readonly contentEncryptionService: IContentEncryption,
   ) {}
 
   toView(
@@ -64,7 +67,7 @@ export class MessageViewService {
     if (isSender) {
       return {
         ...base,
-        content: this.cryptoMessageService.decrypt(
+        content: this.contentEncryptionService.decryptContent(
           message.getEncryptedContent(),
         ),
       };
@@ -79,7 +82,7 @@ export class MessageViewService {
 
     return {
       ...base,
-      content: this.cryptoMessageService.decrypt(
+      content: this.contentEncryptionService.decryptContent(
         message.getEncryptedContent(),
       ),
     };

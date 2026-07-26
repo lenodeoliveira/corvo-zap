@@ -18,10 +18,11 @@ import { USER_REPOSITORY } from '@/modules/users/domain/tokens/user.repository.t
 import { CITY_REPOSITORY } from '@/modules/cities/domain/tokens/city.repository.token';
 import { DeliveryService } from '@/modules/delivery/application/usecases/delivery.service';
 import { DistanceService } from '@/modules/delivery/application/usecases/distance.service';
-import { CryptoMessageService } from '@/modules/crypto/domain/service/crypto.message.service';
 import { MessageViewService, type MessageView } from '../message-view/message.view.service';
 import { ChatParticipantService } from '@/modules/chat/application/services/chat-participant.service';
 import { DOMAIN_EVENTS, MessageCreatedEvent } from '@/modules/events';
+import type IContentEncryption from '@/modules/crypto/domain/gateways/content.encryption';
+import { CONTENT_ENCRYPTION_SERVICE } from '@/modules/crypto/domain/tokens/content.encryption.token';
 
 interface CreateMessageProps {
   chatId: string;
@@ -35,14 +36,15 @@ export class CreateMessageService {
   constructor(
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: IMessageRepository,
-    private readonly chatParticipantService: ChatParticipantService,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
     @Inject(CITY_REPOSITORY)
     private readonly cityRepository: ICityRepository,
+    @Inject(CONTENT_ENCRYPTION_SERVICE)
+    private readonly contentEncryptionService: IContentEncryption,
+    private readonly chatParticipantService: ChatParticipantService,
     private readonly deliveryService: DeliveryService,
     private readonly distanceService: DistanceService,
-    private readonly cryptoMessageService: CryptoMessageService,
     private readonly messageViewService: MessageViewService,
     private readonly eventEmitter: EventEmitter2,
     @InjectDataSource()
@@ -98,7 +100,7 @@ export class CreateMessageService {
     );
     
     const delivery = this.deliveryService.scheduleDelivery(travelTimeMinutes);
-    const encryptedContent = this.cryptoMessageService.encrypt(input.content);
+    const encryptedContent = this.contentEncryptionService.encryptContent(input.content);
 
     const message = MessageEntity.send({
       chatId: input.chatId,
