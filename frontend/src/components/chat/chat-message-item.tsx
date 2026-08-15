@@ -153,6 +153,12 @@ export function ChatMessageItem({
     openingOpacity,
   ]);
 
+  const messageStatus = isServerRead
+    ? 'READ'
+    : isServerDelivered || (isOwn && liveTracking.status === 'DELIVERED')
+      ? 'DELIVERED'
+      : 'TRAVELING';
+
   if (isOwn) {
     return (
       <View style={styles.container}>
@@ -160,8 +166,8 @@ export function ChatMessageItem({
           <MessageBubble
             content={message.content ?? ''}
             isOwn={isOwn}
-            isDelivered={isServerDelivered}
-            isRead={isServerRead}
+            progress={liveTracking.progress}
+            status={messageStatus}
             time={formatMessageTime(message.departureAt)}
           />
         ) : null}
@@ -176,14 +182,13 @@ export function ChatMessageItem({
           <Animated.View style={{ opacity: cardOpacity }}>
             <TravelingCard
               arrivalAt={message.tracking.arrivalAt}
-              departureAt={message.departureAt}
               liveTracking={liveTracking}
             />
 
             {isAwaitingContent ? (
               <Animated.View style={[styles.openingOverlay, { opacity: openingOpacity }]}>
                 <ActivityIndicator color={theme.colors.primaryDark} size="small" />
-                <Text style={styles.openingText}>Corvo chegou, abrindo mensagem...</Text>
+                <Text style={styles.openingText}>Corvo chegou, abrindo a carta...</Text>
               </Animated.View>
             ) : null}
           </Animated.View>
@@ -201,8 +206,7 @@ export function ChatMessageItem({
             <MessageBubble
               content={message.content ?? ''}
               isOwn={isOwn}
-              isDelivered={isServerDelivered}
-              isRead={isServerRead}
+              status={messageStatus}
               time={formatMessageTime(message.departureAt)}
             />
           </Animated.View>

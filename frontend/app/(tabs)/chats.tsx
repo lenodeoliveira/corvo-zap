@@ -14,9 +14,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChatListItem } from '@/components/chat/chat-list-item';
 import { ChatSearchBar } from '@/components/chat/chat-search-bar';
+import { ChatsEmptyState } from '@/components/chat/chats-empty-state';
 import { ChatsHeader } from '@/components/chat/chats-header';
 import { UserListItem } from '@/components/chat/user-list-item';
-import { useTheme } from '@/hooks/use-theme';
 import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
 import { chatsService } from '@/services/chats.service';
 import { usersService } from '@/services/users.service';
@@ -40,7 +40,6 @@ type ListSection = {
 };
 
 export default function ChatsScreen() {
-  const colors = useTheme();
   const router = useRouter();
   const queryClient = useQueryClient();
   const currentUserId = useAuthStore((state) => state.user?.id ?? '');
@@ -113,7 +112,7 @@ export default function ChatsScreen() {
     if (filteredChats.length > 0) {
       result.push({
         key: 'chats',
-        title: 'Conversas',
+        title: 'Correspondências',
         data: filteredChats.map((chat) => ({ kind: 'chat', chat })),
       });
     }
@@ -121,7 +120,7 @@ export default function ChatsScreen() {
     if (isSearchingUsers && filteredUsers.length > 0) {
       result.push({
         key: 'users',
-        title: 'Pessoas',
+        title: 'Mensageiros',
         data: filteredUsers.map((user) => ({ kind: 'user', user })),
       });
     }
@@ -150,12 +149,13 @@ export default function ChatsScreen() {
     setSearchQuery('');
   }
 
+  function handleCancelSearch() {
+    setUserSearchMode(false);
+    setSearchQuery('');
+  }
+
   function handleSearchChange(value: string) {
     setSearchQuery(value);
-
-    if (value.trim().length === 0 && !userSearchMode) {
-      return;
-    }
   }
 
   const isListLoading = isLoading || (isSearchingUsers && isLoadingUsers);
@@ -163,12 +163,22 @@ export default function ChatsScreen() {
   const hasNoResults = !isListLoading && !isListError && sections.length === 0;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <ChatsHeader onNewChat={handleNewChat} />
+      <View style={styles.atmosphere} pointerEvents="none">
+        <View style={styles.glowTop} />
+      </View>
+
+      <ChatsHeader
+        searching={userSearchMode}
+        onCancelSearch={handleCancelSearch}
+        onNewChat={handleNewChat}
+      />
       <ChatSearchBar
         placeholder={
-          userSearchMode ? 'Buscar usuário por nome ou e-mail' : 'Buscar conversas ou pessoas'
+          userSearchMode
+            ? 'Buscar mensageiro por nome ou e-mail'
+            : 'Buscar correspondências ou pessoas'
         }
         value={searchQuery}
         onChangeText={handleSearchChange}
@@ -176,7 +186,7 @@ export default function ChatsScreen() {
 
       {isListLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator color={theme.colors.primary} />
         </View>
       ) : isListError ? (
         <View style={styles.center}>
@@ -202,11 +212,10 @@ export default function ChatsScreen() {
           onRefresh={refetch}
           stickySectionHeadersEnabled={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              {searchQuery || userSearchMode
-                ? 'Nenhuma conversa ou pessoa encontrada para essa busca.'
-                : 'Nenhum chat ainda. Toque em + ou busque alguém para iniciar uma conversa.'}
-            </Text>
+            <ChatsEmptyState
+              searching={Boolean(searchQuery || userSearchMode)}
+              onNewChat={handleNewChat}
+            />
           }
           renderSectionHeader={({ section }) => (
             <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -233,6 +242,19 @@ export default function ChatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  atmosphere: {
+    ...StyleSheet.absoluteFill,
+  },
+  glowTop: {
+    position: 'absolute',
+    top: -60,
+    right: -20,
+    width: 180,
+    height: 180,
+    borderRadius: 180,
+    backgroundColor: 'rgba(212, 166, 90, 0.07)',
   },
   center: {
     flex: 1,
@@ -243,7 +265,10 @@ const styles = StyleSheet.create({
   },
   list: {
     flexGrow: 1,
-    paddingBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.lg,
+    paddingTop: theme.spacing.xs,
+    paddingLeft: theme.spacing.lg,
+    paddingRight: theme.spacing.lg,
   },
   listEmpty: {
     flexGrow: 1,
@@ -253,12 +278,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: theme.typography.fontFamily.semiBold,
     fontSize: theme.typography.fontSize.xs,
-    color: theme.colors.text.disabled,
+    color: theme.colors.primary,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    paddingHorizontal: theme.spacing.md,
+    letterSpacing: 1,
+    paddingHorizontal: theme.spacing.xs,
     paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.xs,
+    paddingBottom: theme.spacing.lg,
   },
   emptyText: {
     fontFamily: theme.typography.fontFamily.regular,

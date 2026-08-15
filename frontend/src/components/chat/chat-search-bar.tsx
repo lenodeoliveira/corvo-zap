@@ -16,7 +16,7 @@ export function ChatSearchBar({
 }: ChatSearchBarProps) {
   return (
     <View style={styles.container}>
-      <Feather name="search" size={18} color={theme.colors.text.disabled} />
+      <Feather name="search" size={18} color={theme.colors.primary} />
       <TextInput
         placeholder={placeholder}
         placeholderTextColor={theme.colors.text.disabled}
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
-    height: theme.input.height,
-    borderRadius: theme.radius.md,
+    height: 48,
+    borderRadius: theme.radius.lg,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.border,

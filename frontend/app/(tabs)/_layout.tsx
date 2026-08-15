@@ -14,7 +14,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.textSecondary,
       }}>
-      <Tabs.Screen name="chats" options={{ title: 'Chats', headerShown: false }} />
+      <Tabs.Screen name="chats" options={{ title: 'Corvos', headerShown: false }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
       <Tabs.Screen name="settings" options={{ title: 'Configurações' }} />
     </Tabs>

@@ -1,4 +1,3 @@
-import Feather from '@expo/vector-icons/Feather';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -21,12 +20,11 @@ const ink = {
 } as const;
 
 type TravelingCardProps = {
-  departureAt: string;
   arrivalAt: string;
   liveTracking: LiveTracking;
 };
 
-export function TravelingCard({ departureAt, arrivalAt, liveTracking }: TravelingCardProps) {
+export function TravelingCard({ arrivalAt, liveTracking }: TravelingCardProps) {
   const { traveledKm, totalKm } = getDistanceProgress(liveTracking);
   const [trackWidth, setTrackWidth] = useState(0);
   const progressRatio = Math.max(0, Math.min(liveTracking.progress, 100)) / 100;
@@ -41,18 +39,9 @@ export function TravelingCard({ departureAt, arrivalAt, liveTracking }: Travelin
         <Image source={parchmentBg} style={styles.parchmentImage} contentFit="fill" />
 
         <View style={styles.content}>
-          <Text style={styles.title}>
-            Você está prestes a receber um corvo, aguarde ele chegar
-          </Text>
+          <Text style={styles.title}>O corvo está a caminho</Text>
 
           <View style={styles.ornament} />
-
-          <View style={styles.illustration}>
-            <Feather name="feather" size={28} color={ink.primary} style={styles.ravenIcon} />
-            <View style={styles.letter}>
-              <Feather name="mail" size={10} color={theme.colors.error} />
-            </View>
-          </View>
 
           <View style={styles.progressHeader}>
             <View
@@ -78,28 +67,17 @@ export function TravelingCard({ departureAt, arrivalAt, liveTracking }: Travelin
 
           <View style={styles.statsRow}>
             <View style={styles.stat}>
-              <Text style={styles.statLabel}>Distância percorrida</Text>
-              <Text style={styles.statValue}>
-                {traveledKm.toLocaleString('pt-BR')} km de {totalKm.toLocaleString('pt-BR')} km
-              </Text>
-            </View>
-
-            <View style={styles.stat}>
-              <Text style={styles.statLabel}>Tempo restante</Text>
+              <Text style={styles.statLabel}>Restante</Text>
               <Text style={styles.statValue}>
                 {formatRemainingTime(liveTracking.remainingMinutes)}
               </Text>
-            </View>
-          </View>
-
-          <View style={styles.statsRow}>
-            <View style={styles.stat}>
-              <Text style={styles.statLabel}>Tempo estimado</Text>
-              <Text style={styles.statValue}>{formatArrivalLabel(departureAt)}</Text>
+              <Text style={styles.statHint}>
+                {traveledKm.toLocaleString('pt-BR')} / {totalKm.toLocaleString('pt-BR')} km
+              </Text>
             </View>
 
             <View style={styles.stat}>
-              <Text style={styles.statLabel}>Chegada prevista</Text>
+              <Text style={styles.statLabel}>Chegada</Text>
               <Text style={styles.statValue}>{formatArrivalLabel(arrivalAt)}</Text>
             </View>
           </View>
@@ -126,9 +104,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   content: {
-    paddingTop: 36,
-    paddingBottom: 34,
-    paddingHorizontal: 34,
+    paddingTop: 28,
+    paddingBottom: 28,
+    paddingHorizontal: 28,
     gap: theme.spacing.sm,
   },
   title: {
@@ -140,35 +118,15 @@ const styles = StyleSheet.create({
   },
   ornament: {
     alignSelf: 'center',
-    width: '68%',
+    width: '56%',
     height: 1,
     backgroundColor: 'rgba(61, 43, 31, 0.28)',
-  },
-  illustration: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  ravenIcon: {
-    transform: [{ rotate: '-20deg' }],
-  },
-  letter: {
-    position: 'absolute',
-    right: '38%',
-    top: 12,
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 43, 31, 0.25)',
   },
   progressHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.xs,
+    marginTop: theme.spacing.xs,
   },
   progressTrackContainer: {
     flex: 1,
@@ -201,7 +159,8 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.xs,
   },
   stat: {
     flex: 1,
@@ -216,5 +175,11 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily.semiBold,
     fontSize: theme.typography.fontSize.xs,
     color: ink.primary,
+  },
+  statHint: {
+    fontFamily: theme.typography.fontFamily.regular,
+    fontSize: 10,
+    color: ink.muted,
+    marginTop: 1,
   },
 });

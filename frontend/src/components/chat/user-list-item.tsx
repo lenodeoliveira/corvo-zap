@@ -34,7 +34,9 @@ export function UserListItem({ user, loading = false, onPress }: UserListItemPro
         {loading ? (
           <ActivityIndicator color={theme.colors.primary} size="small" />
         ) : (
-          <Feather name="message-circle" size={20} color={theme.colors.primary} />
+          <View style={styles.action}>
+            <Feather name="feather" size={16} color={theme.colors.black} />
+          </View>
         )}
       </View>
     </Pressable>
@@ -46,11 +48,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.md,
+    marginHorizontal: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
   },
   containerPressed: {
     backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
   },
   avatar: {
     width: 52,
@@ -82,7 +86,15 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   meta: {
-    minWidth: 28,
+    minWidth: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  action: {
+    width: 36,
+    height: 36,
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

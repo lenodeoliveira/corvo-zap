@@ -21,7 +21,6 @@ import { ChatDetailHeader } from '@/components/chat/chat-detail-header';
 import { ChatMessageItem } from '@/components/chat/chat-message-item';
 import { useRefetchOnAppFocus } from '@/hooks/use-refetch-on-app-focus';
 import { useJoinChat } from '@/components/providers/realtime-provider';
-import { useTheme } from '@/hooks/use-theme';
 import { chatsService } from '@/services/chats.service';
 import { messagesService } from '@/services/messages.service';
 import { usersService } from '@/services/users.service';
@@ -40,7 +39,6 @@ function sortMessagesChronologically(messages: Message[]): Message[] {
 }
 
 export default function ChatScreen() {
-  const colors = useTheme();
   const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
   const currentUserId = useAuthStore((state) => state.user?.id ?? '');
@@ -180,8 +178,15 @@ export default function ChatScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
+      <View style={styles.atmosphere} pointerEvents="none">
+        <View style={styles.glowTop} />
+        <View style={styles.glowBottom} />
+        <View style={styles.gridLine} />
+        <View style={[styles.gridLine, styles.gridLineDelayed]} />
+      </View>
+
       <ChatDetailHeader participantName={participantName} onBack={() => router.back()} />
 
       <KeyboardAvoidingView
@@ -190,7 +195,7 @@ export default function ChatScreen() {
         style={styles.content}>
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator color={colors.primary} />
+            <ActivityIndicator color={theme.colors.primary} />
           </View>
         ) : isError ? (
           <View style={styles.center}>
@@ -213,7 +218,12 @@ export default function ChatScreen() {
             onScroll={handleListScroll}
             scrollEventThrottle={16}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>Nenhuma mensagem neste chat.</Text>
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>Nenhuma carta ainda</Text>
+                <Text style={styles.emptyText}>
+                  Envie um corvo para começar esta correspondência.
+                </Text>
+              </View>
             }
             renderItem={({ item }) => (
               <ChatMessageItem
@@ -240,6 +250,39 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  atmosphere: {
+    ...StyleSheet.absoluteFill,
+  },
+  glowTop: {
+    position: 'absolute',
+    top: -80,
+    left: '15%',
+    width: 220,
+    height: 220,
+    borderRadius: 220,
+    backgroundColor: 'rgba(212, 166, 90, 0.08)',
+  },
+  glowBottom: {
+    position: 'absolute',
+    bottom: 120,
+    right: -40,
+    width: 180,
+    height: 180,
+    borderRadius: 180,
+    backgroundColor: 'rgba(91, 64, 40, 0.25)',
+  },
+  gridLine: {
+    position: 'absolute',
+    top: '28%',
+    left: 24,
+    right: 24,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(212, 166, 90, 0.08)',
+  },
+  gridLineDelayed: {
+    top: '62%',
   },
   content: {
     flex: 1,
@@ -260,6 +303,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.lg,
+  },
+  emptyState: {
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  emptyTitle: {
+    fontFamily: theme.typography.fontFamily.title,
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.secondary,
+    textAlign: 'center',
   },
   emptyText: {
     fontFamily: theme.typography.fontFamily.regular,

@@ -28,15 +28,9 @@ export function ChatDetailHeader({ participantName, onBack }: ChatDetailHeaderPr
           <Text numberOfLines={1} style={styles.name}>
             {participantName}
           </Text>
-          <Text style={styles.status}>Online</Text>
+          <Text style={styles.status}>Correspondência por corvos</Text>
         </View>
       </View>
-
-      <Pressable
-        accessibilityLabel="Mais opções"
-        style={({ pressed }) => [styles.iconButton, pressed && styles.iconButtonPressed]}>
-        <Feather name="more-vertical" size={20} color={theme.colors.text.primary} />
-      </Pressable>
     </View>
   );
 }
@@ -50,6 +44,7 @@ const styles = StyleSheet.create({
     paddingBottom: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    backgroundColor: 'rgba(18, 18, 18, 0.92)',
   },
   iconButton: {
     width: 40,
@@ -66,6 +61,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
+    paddingRight: theme.spacing.sm,
   },
   avatar: {
     width: 44,
@@ -73,7 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.pill,
     backgroundColor: theme.colors.surfaceLight,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -94,6 +90,6 @@ const styles = StyleSheet.create({
   status: {
     fontFamily: theme.typography.fontFamily.regular,
     fontSize: theme.typography.fontSize.xs,
-    color: theme.colors.text.secondary,
+    color: theme.colors.primary,
   },
 });

@@ -47,21 +47,50 @@ export function getMessagePreview(
   currentUserId: string,
 ): string {
   if (!message) {
-    return 'Nenhuma mensagem ainda';
+    return 'Nenhuma carta ainda';
   }
 
   const isFromCurrentUser = message.senderId === currentUserId;
   const isTraveling = message.tracking.status === 'TRAVELING';
 
-  if (!isFromCurrentUser && isTraveling) {
-    return 'Você está prestes a receber um corvo, aguarde ele chegar';
+  if (isTraveling) {
+    return formatTravelingPreview(message, isFromCurrentUser);
   }
 
-  if (isFromCurrentUser && isTraveling) {
-    return message.content?.trim() || 'Mensagem enviada';
+  if (isFromCurrentUser) {
+    return message.content?.trim() || 'Carta entregue';
   }
 
-  return message.content?.trim() || 'Mensagem entregue';
+  return message.content?.trim() || 'Carta recebida';
+}
+
+export function formatTravelingPreview(
+  message: Message,
+  isFromCurrentUser: boolean,
+  live?: { progress: number; remainingMinutes: number },
+): string {
+  const progress = live?.progress ?? message.tracking.progress;
+  const remainingMinutes = live?.remainingMinutes ?? message.tracking.remainingMinutes;
+  const remainingLabel = formatRemainingMinutes(remainingMinutes);
+  const prefix = isFromCurrentUser ? 'Seu corvo' : 'Corvo';
+
+  return `${prefix} a ${progress}% · chega em ${remainingLabel}`;
+}
+
+function formatRemainingMinutes(minutes: number): string {
+  const safeMinutes = Math.max(0, minutes);
+  const hours = Math.floor(safeMinutes / 60);
+  const remainingMinutes = safeMinutes % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${remainingMinutes.toString().padStart(2, '0')}min`;
+  }
+
+  return `${remainingMinutes}min`;
+}
+
+export function isTravelingMessage(message: Message | undefined): boolean {
+  return message?.tracking.status === 'TRAVELING';
 }
 
 export function isIncomingTravelingMessage(
@@ -72,9 +101,18 @@ export function isIncomingTravelingMessage(
     return false;
   }
 
-  return (
-    message.senderId !== currentUserId && message.tracking.status === 'TRAVELING'
-  );
+  return message.senderId !== currentUserId && message.tracking.status === 'TRAVELING';
+}
+
+export function isOutgoingTravelingMessage(
+  message: Message | undefined,
+  currentUserId: string,
+): boolean {
+  if (!message) {
+    return false;
+  }
+
+  return message.senderId === currentUserId && message.tracking.status === 'TRAVELING';
 }
 
 export function formatChatTimestamp(message: Message | undefined): string | null {
