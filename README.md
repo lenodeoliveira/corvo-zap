@@ -28,17 +28,25 @@ O projeto foi criado como um laboratório para estudo de arquitetura de software
 
 ## Telas
 
-<p align="center">
-  <img src="./docs/screenshots/login.png" width="240" alt="Tela de login do Corvo-Zap"/>
-  &nbsp;
-  <img src="./docs/screenshots/chats.png" width="240" alt="Listagem de correspondências"/>
-  &nbsp;
-  <img src="./docs/screenshots/chat.png" width="240" alt="Conversa com rastreamento do corvo"/>
-</p>
-
-<p align="center">
-  <em>Login · Correspondências · Conversa com o corvo a caminho</em>
-</p>
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/login.png" width="260" alt="Tela de login do Corvo-Zap"/>
+      <br/>
+      <sub>Login</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/chats.png" width="260" alt="Listagem de correspondências"/>
+      <br/>
+      <sub>Correspondências</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/chat.png" width="260" alt="Conversa com rastreamento do corvo"/>
+      <br/>
+      <sub>Conversa</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
