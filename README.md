@@ -31,19 +31,36 @@ O projeto foi criado como um laboratório para estudo de arquitetura de software
 <table>
   <tr>
     <td align="center" valign="top" width="33%">
-      <img src="./docs/screenshots/login.png" width="260" alt="Tela de login do Corvo-Zap"/>
+      <img src="./docs/screenshots/login.png" width="180" alt="Tela de login"/>
       <br/>
       <sub>Login</sub>
     </td>
     <td align="center" valign="top" width="33%">
-      <img src="./docs/screenshots/chats.png" width="260" alt="Listagem de correspondências"/>
+      <img src="./docs/screenshots/chats-empty.png" width="180" alt="Lista vazia de correspondências"/>
+      <br/>
+      <sub>Lista vazia</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/chats.png" width="180" alt="Listagem de correspondências"/>
       <br/>
       <sub>Correspondências</sub>
     </td>
+  </tr>
+  <tr>
     <td align="center" valign="top" width="33%">
-      <img src="./docs/screenshots/chat.png" width="260" alt="Conversa com rastreamento do corvo"/>
+      <img src="./docs/screenshots/messengers.png" width="180" alt="Busca de mensageiros"/>
       <br/>
-      <sub>Conversa</sub>
+      <sub>Mensageiros</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/chat-empty.png" width="180" alt="Conversa sem cartas"/>
+      <br/>
+      <sub>Conversa vazia</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="./docs/screenshots/chat.png" width="180" alt="Conversa com corvo a caminho"/>
+      <br/>
+      <sub>Corvo a caminho</sub>
     </td>
   </tr>
 </table>
