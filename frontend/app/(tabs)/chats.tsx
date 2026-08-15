@@ -265,8 +265,6 @@ const styles = StyleSheet.create({
   },
   list: {
     flexGrow: 1,
-    paddingBottom: theme.spacing.lg,
-    paddingTop: theme.spacing.xs,
     paddingLeft: theme.spacing.lg,
     paddingRight: theme.spacing.lg,
   },
