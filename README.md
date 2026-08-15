@@ -26,6 +26,22 @@ O projeto foi criado como um laboratório para estudo de arquitetura de software
 
 ---
 
+## Telas
+
+<p align="center">
+  <img src="./docs/screenshots/login.png" width="240" alt="Tela de login do Corvo-Zap"/>
+  &nbsp;
+  <img src="./docs/screenshots/chats.png" width="240" alt="Listagem de correspondências"/>
+  &nbsp;
+  <img src="./docs/screenshots/chat.png" width="240" alt="Conversa com rastreamento do corvo"/>
+</p>
+
+<p align="center">
+  <em>Login · Correspondências · Conversa com o corvo a caminho</em>
+</p>
+
+---
+
 <p align="center">
 
 ![NestJS](https://img.shields.io/badge/NestJS-v11-E0234E?logo=nestjs)
